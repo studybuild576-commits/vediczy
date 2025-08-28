@@ -1,0 +1,7 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:latest",
+  "features": {
+    "ghcr.io/devcontainers/features/flutter:1": {}
+  },
+  "postCreateCommand": "flutter doctor --android-licenses && flutter doctor"
+}
