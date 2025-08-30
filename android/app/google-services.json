@@ -1,0 +1,47 @@
+"project_info": {
+    "project_number": "591156419005",
+    "project_id": "r2examprep",
+    "storage_bucket": "r2examprep.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591156419005:android:7b4db51894cd47f5e55ad4",
+        "android_client_info": {
+          "package_name": "com.example.vediczy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAobuTyRJ6lp8XugvWVgszjgynCTDyByE4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591156419005:android:b5fb5bef09962200e55ad4",
+        "android_client_info": {
+          "package_name": "com.vediczy.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAobuTyRJ6lp8XugvWVgszjgynCTDyByE4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
