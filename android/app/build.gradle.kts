@@ -42,3 +42,22 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // Firebase Bill of Materials (BOM) ka use karein. Yeh saari Firebase
+    // dependencies ke versions ko manage karega.
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+
+    // Firebase Authentication aur Firestore SDKs add karein.
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+
+    // Google Sign-In functionality ke liye play-services-auth add karein.
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+
+    // Baaki dependencies yahan hain
+    // jaise ki flutter ke default dependencies
+}
+
+// Yeh plugin file ke bilkul aakhir mein hona zaroori hai.
+apply(plugin = "com.google.gms.google-services")
