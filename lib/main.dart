@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-// Aapke pehle ke code se GoogleSignInPage ka import
-import 'package:vediczy/google_sign_in_page.dart'; // File path ko adjust karein
+// Import path ko theek kiya gaya hai kyunki file 'screens' folder mein hai.
+import 'package:vediczy/screens/google_sign_in_page.dart';
 
 // Main function ab async hai, taki Firebase ko app chalane se pehle initialize kar sakein.
 Future<void> main() async {
@@ -52,6 +51,7 @@ class AuthWrapper extends StatelessWidget {
           return const MyHomePage(title: 'Firestore Test Data');
         }
         // Agar user signed-in nahi hai, toh GoogleSignInPage dikhayein.
+        // 'const' keyword ko yahan se hata diya gaya hai.
         return const GoogleSignInPage();
       },
     );
