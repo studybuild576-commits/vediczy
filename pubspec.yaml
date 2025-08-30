@@ -35,6 +35,15 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  # Firebase ke core functionalities ke liye
+  firebase_core: ^2.32.0
+  # User authentication ko handle karne ke liye
+  firebase_auth: ^4.19.4
+  # Google Sign-In support ke liye
+  google_sign_in: ^6.2.1
+  # Firestore database ke liye (agar aapko data save karna ho)
+  cloud_firestore: ^4.17.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
