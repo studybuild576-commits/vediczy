@@ -18,7 +18,6 @@ class _GoogleSignInPageState extends State<GoogleSignInPage> {
     });
 
     try {
-      // Step 1: Trigger the Google Sign-In flow
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
       if (googleUser == null) {
@@ -29,26 +28,24 @@ class _GoogleSignInPageState extends State<GoogleSignInPage> {
         return;
       }
 
-      // Step 2: Google user se authentication details lo
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      // Step 3: Firebase mein sign-in karo Google credential ke saath
       await FirebaseAuth.instance.signInWithCredential(credential);
     } on FirebaseAuthException catch (e) {
-      // Firebase authentication errors ko handle karo
+      // Firebase se aane wale specific errors ko dikhayein
       print("Firebase Auth Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sign-in failed: ${e.message}')),
+        SnackBar(content: Text('Firebase Auth failed: ${e.message}')),
       );
     } catch (e) {
-      // Doosre errors ko handle karo
+      // Google Sign-In ya kisi aur error ko dikhayein
       print("General Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: const Text('An unknown error occurred.')),
+        SnackBar(content: Text('An unknown error occurred: $e')),
       );
     } finally {
       setState(() {
