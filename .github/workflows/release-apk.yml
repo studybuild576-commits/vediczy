@@ -1,0 +1,50 @@
+name: Android Release APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Grant execute permission to gradlew
+        run: chmod +x android/gradlew
+
+      - name: Build debug APK
+        run: ./android/gradlew assembleDebug
+
+      - name: Sign APK
+        run: ./android/gradlew signReleaseBundle --stacktrace
+        env:
+          ANDROID_SIGNING_KEY_STORE_FILE: ${{ secrets.ANDROID_SIGNING_KEY_STORE_FILE }}
+          ANDROID_SIGNING_KEY_STORE_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_STORE_PASSWORD }}
+          ANDROID_SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
+          ANDROID_SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
+
+      - name: Generate SHA-1 Key
+        id: sha1_key
+        run: |
+          KEY_STORE_FILE_PATH="keystore.jks"
+          echo "${{ secrets.ANDROID_SIGNING_KEY_STORE_FILE }}" | base64 --decode > "$KEY_STORE_FILE_PATH"
+
+          SHA1_KEY=$(keytool -list -v -keystore "$KEY_STORE_FILE_PATH" -alias "${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}" -storepass "${{ secrets.ANDROID_SIGNING_KEY_STORE_PASSWORD }}" -keypass "${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}" | grep 'SHA1:' | cut -d ' ' -f 10)
+          echo "SHA-1 Key: $SHA1_KEY"
+          echo "sha1_key=$SHA1_KEY" >> $GITHUB_ENV
+
+      - name: Upload APK to Release
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: android/app/build/outputs/apk/debug/app-debug.apk
