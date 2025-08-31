@@ -46,10 +46,14 @@ android {
 
     buildTypes {
         getByName("release") {
+            // yahi fix hai
             isMinifyEnabled = false
+            isShrinkResources = false
             signingConfig = signingConfigs.getByName("release")
         }
         getByName("debug") {
+            isMinifyEnabled = false
+            isShrinkResources = false
             signingConfig = signingConfigs.getByName("debug")
         }
     }
