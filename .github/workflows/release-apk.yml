@@ -1,33 +1,39 @@
-name: Show SHA1 Key from Permanent Keystore
+name: Android Build and SHA1 Key
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
-  show-sha1:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: '11'
-          distribution: 'temurin'
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
 
-      - name: Decode permanent keystore
-        run: |
-          echo "📦 Keystore decoding..."
-          echo "${{ secrets.CM_KEYSTORE }}" | base64 --decode > android/app/upload-keystore.jks
+    - name: Decode permanent keystore
+      run: |
+        echo "${{ secrets.CM_KEYSTORE }}" | base64 --decode > android/app/upload-keystore.jks
 
-      - name: Show SHA1 from permanent keystore
-        run: |
-          echo "🔐 SHA1 Key (from keystore):"
-          keytool -list -v \
-            -keystore android/app/upload-keystore.jks \
-            -alias "${{ secrets.CM_KEY_ALIAS }}" \
-            -storepass "${{ secrets.CM_KEYSTORE_PASSWORD }}" \
-            -keypass "${{ secrets.CM_KEY_PASSWORD }}" \
-            | grep 'SHA1:'
+    - name: Generate SHA1 from permanent keystore
+      run: |
+        echo "🔐 Permanent SHA1 (from keystore):"
+        keytool -list -v \
+          -keystore android/app/upload-keystore.jks \
+          -alias "${{ secrets.CM_KEY_ALIAS }}" \
+          -storepass "${{ secrets.CM_KEYSTORE_PASSWORD }}" \
+          -keypass "${{ secrets.CM_KEY_PASSWORD }}" \
+          | grep 'SHA1:'
+
+    - name: Show expected SHA1 (from secret)
+      run: |
+        echo "✅ Expected SHA1 (from GitHub Secret):"
+        echo "${{ secrets.PERMANENT_SHA1 }}"
