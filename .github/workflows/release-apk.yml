@@ -1,34 +1,67 @@
-name: Android Build and SHA1 Key
+name: Flutter Android Build
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
+    name: Build Android App with Permanent Keystore
     runs-on: ubuntu-latest
 
+    env:
+      # Secrets from GitHub Repo Settings > Secrets and variables > Actions
+      CM_KEYSTORE: ${{ secrets.CM_KEYSTORE }}
+      CM_KEYSTORE_PASSWORD: ${{ secrets.CM_KEYSTORE_PASSWORD }}
+      CM_KEY_ALIAS: ${{ secrets.CM_KEY_ALIAS }}
+      CM_KEY_PASSWORD: ${{ secrets.CM_KEY_PASSWORD }}
+      ANDROID_SHA1_KEY: ${{ secrets.ANDROID_SHA1_KEY }}
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout Repo
+        uses: actions/checkout@v3
 
-    - name: Set up JDK
-      uses: actions/setup-java@v4
-      with:
-        java-version: '11'
-        distribution: 'temurin'
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: stable
 
-    - name: Generate Debug Keystore if not exists
-      run: |
-        if [ ! -f android/app/debug.keystore ]; then
-          echo "Generating debug keystore..."
-          keytool -genkey -v -keystore android/app/debug.keystore -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -alias androiddebugkey -dname "CN=Android Debug, OU=Android, O=Android, L=Local, ST=State, C=Country"
-        else
-          echo "Debug keystore already exists."
-        fi
+      - name: Install dependencies
+        run: flutter pub get
 
-    - name: Generate SHA1 Key
-      run: |
-        keytool -list -v -keystore android/app/debug.keystore -alias androiddebugkey -storepass android -keypass android
-      shell: bash
+      - name: Decode and setup Keystore
+        run: |
+          echo "Setting up keystore..."
+          echo "$CM_KEYSTORE" | base64 --decode > android/app/my-release-key.keystore
+
+          cat > android/key.properties <<EOF
+          storePassword=$CM_KEYSTORE_PASSWORD
+          keyPassword=$CM_KEY_PASSWORD
+          keyAlias=$CM_KEY_ALIAS
+          storeFile=my-release-key.keystore
+          EOF
+
+      - name: Print Permanent SHA-1 from Environment
+        run: |
+          echo "== Permanent SHA-1 (from env) =="
+          echo "$ANDROID_SHA1_KEY"
+
+      - name: Print SHA-1 from Keystore (Actual Build Key)
+        run: |
+          echo "== SHA-1 from actual keystore being used =="
+          keytool -list -v \
+            -keystore android/app/my-release-key.keystore \
+            -alias "$CM_KEY_ALIAS" \
+            -storepass "$CM_KEYSTORE_PASSWORD" \
+            -keypass "$CM_KEY_PASSWORD" | grep SHA1
+
+      - name: Build Android AAB
+        run: flutter build appbundle --release
+
+      - name: Upload AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.aab
+          path: build/app/outputs/bundle/release/app-release.aab
