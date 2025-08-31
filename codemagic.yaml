@@ -1,7 +1,7 @@
 workflows:
   android-release:
     name: Android Release Build
-    max_build_duration: 120   # 2 hours max build time
+    max_build_duration: 120
     environment:
       flutter: stable
       java: 17
@@ -15,9 +15,7 @@ workflows:
         script: |
           echo "Setting up keystore..."
           mkdir -p android/app
-          # Decode the keystore from base64 (जो तुम secrets में रखोगे)
           echo $CM_KEYSTORE | base64 --decode > android/app/my-release-key.keystore
-          # Create key.properties file
           cat > android/key.properties <<EOF
           storePassword=$CM_KEYSTORE_PASSWORD
           keyPassword=$CM_KEY_PASSWORD
@@ -34,7 +32,7 @@ workflows:
           keytool -list -v -keystore android/app/my-release-key.keystore \
             -alias $CM_KEY_ALIAS \
             -storepass $CM_KEYSTORE_PASSWORD \
-            -keypass $CM_KEY_PASSWORD
+            -keypass $CM_KEY_PASSWORD | grep 'SHA1'
 
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
