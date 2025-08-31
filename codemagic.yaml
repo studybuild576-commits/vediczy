@@ -1,0 +1,29 @@
+workflows:
+  android-workflow:
+    name: Build Android App with Permanent Key
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      java: 17
+    scripts:
+      - name: Install dependencies
+        script: flutter pub get
+
+      # Copy keystore and key.properties if stored in repo
+      - name: Setup Keystore
+        script: |
+          echo "== Using permanent release keystore =="
+          ls android/app/my-release-key.keystore || echo "Keystore not found!"
+          ls android/key.properties || echo "key.properties not found!"
+
+      - name: Build release AAB
+        script: flutter build appbundle --release
+
+      - name: Print SHA-1 from built AAB
+        script: |
+          echo "== SHA-1 fingerprint of Codemagic build =="
+          keytool -list -printcert -jarfile build/app/outputs/bundle/release/app-release.aab
+
+    artifacts:
+      - build/app/outputs/flutter-apk/app-release.apk
+      - build/app/outputs/bundle/release/app-release.aab
