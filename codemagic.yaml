@@ -6,8 +6,12 @@ workflows:
       flutter: stable
       java: 17
       vars:
-        GRADLE_OPTS: -Xmx8192m
+        GRADLE_OPTS: -Xmx4096m -Dorg.gradle.jvmargs=-Xmx4096m
     scripts:
+      - name: Setup gradle.properties
+        script: |
+          echo "org.gradle.jvmargs=-Xmx4096m -Dkotlin.daemon.jvm.options=-Xmx2048m" >> android/gradle.properties
+
       - name: Install dependencies
         script: flutter pub get
 
