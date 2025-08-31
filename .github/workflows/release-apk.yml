@@ -1,14 +1,10 @@
-name: Flutter Android Release Build
+name: Print SHA-1 from Keystore
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:  # 🖐️ Manual trigger from GitHub UI
 
 jobs:
-  build:
-    name: Build AAB with Permanent Keystore
+  print-sha1:
     runs-on: ubuntu-latest
 
     env:
@@ -19,48 +15,21 @@ jobs:
       ANDROID_SHA1_KEY: ${{ secrets.ANDROID_SHA1_KEY }}
 
     steps:
-      - name: Checkout repository
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Flutter
-        uses: subosito/flutter-action@v4
-        with:
-          flutter-version: '3.19.6'  # ✅ Use exact version to avoid errors
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Setup Keystore
+      - name: 🛠️ Set up keystore
         run: |
-          echo "Setting up keystore..."
-          echo "$CM_KEYSTORE" | base64 --decode > android/app/my-release-key.keystore
+          echo "$CM_KEYSTORE" | base64 --decode > my-release-key.keystore
 
-          cat > android/key.properties <<EOF
-          storePassword=$CM_KEYSTORE_PASSWORD
-          keyPassword=$CM_KEY_PASSWORD
-          keyAlias=$CM_KEY_ALIAS
-          storeFile=my-release-key.keystore
-          EOF
-
-      - name: Print Permanent SHA-1 (from GitHub Secret)
+      - name: 🔍 Print SHA-1 from Keystore
         run: |
-          echo "== Permanent SHA-1 (from env) =="
+          echo "== Permanent SHA-1 (from env variable)=="
           echo "$ANDROID_SHA1_KEY"
 
-      - name: Print SHA-1 from actual Keystore
-        run: |
-          echo "== SHA-1 from actual keystore being used =="
+          echo "== SHA-1 from actual .keystore file =="
           keytool -list -v \
-            -keystore android/app/my-release-key.keystore \
+            -keystore my-release-key.keystore \
             -alias "$CM_KEY_ALIAS" \
             -storepass "$CM_KEYSTORE_PASSWORD" \
             -keypass "$CM_KEY_PASSWORD" | grep SHA1
-
-      - name: Build Release AAB
-        run: flutter build appbundle --release
-
-      - name: Upload AAB as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release.aab
-          path: build/app/outputs/bundle/release/app-release.aab
