@@ -1,4 +1,4 @@
-name: Flutter Android Build
+name: Flutter Android Release Build
 
 on:
   push:
@@ -8,11 +8,10 @@ on:
 
 jobs:
   build:
-    name: Build Android App with Permanent Keystore
+    name: Build AAB with Permanent Keystore
     runs-on: ubuntu-latest
 
     env:
-      # Secrets from GitHub Repo Settings > Secrets and variables > Actions
       CM_KEYSTORE: ${{ secrets.CM_KEYSTORE }}
       CM_KEYSTORE_PASSWORD: ${{ secrets.CM_KEYSTORE_PASSWORD }}
       CM_KEY_ALIAS: ${{ secrets.CM_KEY_ALIAS }}
@@ -20,18 +19,18 @@ jobs:
       ANDROID_SHA1_KEY: ${{ secrets.ANDROID_SHA1_KEY }}
 
     steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - name: Install Flutter
+        uses: subosito/flutter-action@v4
         with:
-          flutter-version: stable
+          flutter-version: '3.19.6'  # ✅ Use exact version to avoid errors
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Decode and setup Keystore
+      - name: Setup Keystore
         run: |
           echo "Setting up keystore..."
           echo "$CM_KEYSTORE" | base64 --decode > android/app/my-release-key.keystore
@@ -43,12 +42,12 @@ jobs:
           storeFile=my-release-key.keystore
           EOF
 
-      - name: Print Permanent SHA-1 from Environment
+      - name: Print Permanent SHA-1 (from GitHub Secret)
         run: |
           echo "== Permanent SHA-1 (from env) =="
           echo "$ANDROID_SHA1_KEY"
 
-      - name: Print SHA-1 from Keystore (Actual Build Key)
+      - name: Print SHA-1 from actual Keystore
         run: |
           echo "== SHA-1 from actual keystore being used =="
           keytool -list -v \
@@ -57,10 +56,10 @@ jobs:
             -storepass "$CM_KEYSTORE_PASSWORD" \
             -keypass "$CM_KEY_PASSWORD" | grep SHA1
 
-      - name: Build Android AAB
+      - name: Build Release AAB
         run: flutter build appbundle --release
 
-      - name: Upload AAB Artifact
+      - name: Upload AAB as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release.aab
