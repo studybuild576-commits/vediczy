@@ -23,6 +23,13 @@ jobs:
       run: |
         echo "${{ secrets.CM_KEYSTORE }}" | base64 --decode > android/app/upload-keystore.jks
 
+    - name: Create key.properties file
+      run: |
+        echo "storeFile=upload-keystore.jks" > android/key.properties
+        echo "storePassword=${{ secrets.CM_KEYSTORE_PASSWORD }}" >> android/key.properties
+        echo "keyAlias=${{ secrets.CM_KEY_ALIAS }}" >> android/key.properties
+        echo "keyPassword=${{ secrets.CM_KEY_PASSWORD }}" >> android/key.properties
+
     - name: Generate SHA1 from permanent keystore
       run: |
         echo "🔐 Permanent SHA1 (from keystore):"
@@ -37,3 +44,21 @@ jobs:
       run: |
         echo "✅ Expected SHA1 (from GitHub Secret):"
         echo "${{ secrets.PERMANENT_SHA1 }}"
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: 'stable'
+        channel: 'stable'
+
+    - name: Install Flutter dependencies
+      run: flutter pub get
+
+    - name: Build signed release APK
+      run: flutter build apk --release
+
+    - name: Upload release APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
