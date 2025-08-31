@@ -28,15 +28,19 @@ jobs:
 
       - name: Create key.properties file
         run: |
-          echo "storeFile=upload-keystore.jks" >> android/key.properties
+          echo "storeFile=upload-keystore.jks" > android/key.properties
           echo "storePassword=${{ secrets.CM_KEYSTORE_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.CM_KEY_ALIAS }}" >> android/key.properties
           echo "keyPassword=${{ secrets.CM_KEY_PASSWORD }}" >> android/key.properties
-      
-      # Step to verify and print the SHA-1 of the key being used
-      - name: Verify SHA-1 of the keystore
+
+      - name: Show Permanent SHA-1 Key (from secret)
         run: |
-          echo "🔐 बिल्ड के लिए उपयोग की जाने वाली SHA-1 Key:"
+          echo "🔐 स्थायी SHA-1 Key (GitHub Secret से):"
+          echo "${{ secrets.CM_KEY_SHA1 }}"
+
+      - name: Verify actual SHA-1 of keystore being used
+        run: |
+          echo "🔍 Keystore में मौजूद SHA-1:"
           keytool -list -v \
             -keystore android/app/upload-keystore.jks \
             -alias ${{ secrets.CM_KEY_ALIAS }} \
