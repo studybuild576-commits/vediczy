@@ -1,28 +1,40 @@
 workflows:
-  android-workflow:
-    name: Build Android App with Permanent Key
-    max_build_duration: 60
+  android-release:
+    name: Android Release Build
+    max_build_duration: 120   # 2 hours max build time
     environment:
       flutter: stable
       java: 17
+      vars:
+        GRADLE_OPTS: -Xmx8192m
     scripts:
       - name: Install dependencies
         script: flutter pub get
 
-      # Copy keystore and key.properties if stored in repo
       - name: Setup Keystore
         script: |
-          echo "== Using permanent release keystore =="
-          ls android/app/my-release-key.keystore || echo "Keystore not found!"
-          ls android/key.properties || echo "key.properties not found!"
+          echo "Setting up keystore..."
+          mkdir -p android/app
+          # Decode the keystore from base64 (जो तुम secrets में रखोगे)
+          echo $CM_KEYSTORE | base64 --decode > android/app/my-release-key.keystore
+          # Create key.properties file
+          cat > android/key.properties <<EOF
+          storePassword=$CM_KEYSTORE_PASSWORD
+          keyPassword=$CM_KEY_PASSWORD
+          keyAlias=$CM_KEY_ALIAS
+          storeFile=my-release-key.keystore
+          EOF
 
-      - name: Build release AAB
+      - name: Build Release AAB
         script: flutter build appbundle --release
 
-      - name: Print SHA-1 from built AAB
+      - name: Print SHA-1 from Keystore
         script: |
-          echo "== SHA-1 fingerprint of Codemagic build =="
-          keytool -list -printcert -jarfile build/app/outputs/bundle/release/app-release.aab
+          echo "== SHA-1 fingerprint of Keystore =="
+          keytool -list -v -keystore android/app/my-release-key.keystore \
+            -alias $CM_KEY_ALIAS \
+            -storepass $CM_KEYSTORE_PASSWORD \
+            -keypass $CM_KEY_PASSWORD
 
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
