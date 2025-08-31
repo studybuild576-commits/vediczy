@@ -1,51 +1,56 @@
-name: Verify SHA-1 Key
+name: Build and Sign APK
 
 on:
   workflow_dispatch:
 
 jobs:
-  sha1-check:
+  build-apk:
     runs-on: ubuntu-latest
-
-    env:
-      CM_KEYSTORE: ${{ secrets.CM_KEYSTORE }}
-      CM_KEYSTORE_PASSWORD: ${{ secrets.CM_KEYSTORE_PASSWORD }}
-      CM_KEY_ALIAS: ${{ secrets.CM_KEY_ALIAS }}
-      CM_KEY_PASSWORD: ${{ secrets.CM_KEY_PASSWORD }}
-      ANDROID_SHA1_KEY: ${{ secrets.ANDROID_SHA1_KEY }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+          channel: 'stable'
+
       - name: Decode keystore and save to a file
-        run: echo "$CM_KEYSTORE" | base64 --decode > my-release-key.jks
+        run: echo "${{ secrets.CM_KEYSTORE }}" | base64 --decode > android/app/upload-keystore.jks
 
-      - name: Verify SHA-1 from Keystore
+      - name: Create key.properties file
         run: |
-          echo "🔐 SHA-1 from keystore:"
+          echo "storeFile=upload-keystore.jks" >> android/key.properties
+          echo "storePassword=${{ secrets.CM_KEYSTORE_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.CM_KEY_ALIAS }}" >> android/key.properties
+          echo "keyPassword=${{ secrets.CM_KEY_PASSWORD }}" >> android/key.properties
+      
+      # Step to verify and print the SHA-1 of the key being used
+      - name: Verify SHA-1 of the keystore
+        run: |
+          echo "🔐 बिल्ड के लिए उपयोग की जाने वाली SHA-1 Key:"
           keytool -list -v \
-            -keystore my-release-key.jks \
-            -alias "$CM_KEY_ALIAS" \
-            -storepass "$CM_KEYSTORE_PASSWORD" \
-            -keypass "$CM_KEY_PASSWORD" | grep SHA1
+            -keystore android/app/upload-keystore.jks \
+            -alias ${{ secrets.CM_KEY_ALIAS }} \
+            -storepass ${{ secrets.CM_KEYSTORE_PASSWORD }} \
+            -keypass ${{ secrets.CM_KEY_PASSWORD }} | grep SHA1
 
-      - name: Print Permanent SHA-1 from Secret
-        run: |
-          echo "📄 Permanent SHA-1 from secret:"
-          echo "$ANDROID_SHA1_KEY"
+      - name: Install dependencies
+        run: flutter pub get
 
-      - name: Compare SHA-1 Keys
-        run: |
-          KEYSTORE_SHA1=$(keytool -list -v -keystore my-release-key.jks -alias "$CM_KEY_ALIAS" -storepass "$CM_KEYSTORE_PASSWORD" -keypass "$CM_KEY_PASSWORD" | grep SHA1 | cut -d ' ' -f 3)
-          SECRET_SHA1="$ANDROID_SHA1_KEY"
-          
-          if [[ "$KEYSTORE_SHA1" == "$SECRET_SHA1" ]]; then
-            echo "✅ Success: Keystore SHA-1 matches the permanent key."
-            exit 0
-          else
-            echo "❌ Error: Keystore SHA-1 does not match the permanent key."
-            echo "Keystore SHA-1: $KEYSTORE_SHA1"
-            echo "Secret SHA-1: $SECRET_SHA1"
-            exit 1
-          fi
+      - name: Build and Sign APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
