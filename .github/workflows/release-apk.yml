@@ -49,8 +49,7 @@ jobs:
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.29.2'  # <-- यहाँ exact flutter version डालें
-        # channel: 'stable'  # इसे हटा दिया
+        flutter-version: '3.35.2'   # <-- Latest stable Flutter with Dart 3.9+
 
     - name: Install Flutter dependencies
       run: flutter pub get
