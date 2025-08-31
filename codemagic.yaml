@@ -7,11 +7,10 @@ workflows:
       java: 17
       vars:
         GRADLE_OPTS: -Xmx4096m -Dorg.gradle.jvmargs=-Xmx4096m
-        # Permanent SHA1 key (from your local keytool output)
-        ANDROID_SHA1_KEY: <paste-your-sha1-here-if-needed>
+        ANDROID_SHA1_KEY: $ANDROID_SHA1_KEY  # from Codemagic env secrets
 
     scripts:
-      - name: Setup gradle.properties
+      - name: Set gradle.properties
         script: |
           echo "org.gradle.jvmargs=-Xmx4096m -Dkotlin.daemon.jvm.options=-Xmx2048m" >> android/gradle.properties
 
@@ -20,9 +19,10 @@ workflows:
 
       - name: Setup Keystore
         script: |
-          echo "Setting up keystore..."
+          echo "📦 Setting up keystore..."
           mkdir -p android/app
           echo $CM_KEYSTORE | base64 --decode > android/app/my-release-key.keystore
+
           cat > android/key.properties <<EOF
           storePassword=$CM_KEYSTORE_PASSWORD
           keyPassword=$CM_KEY_PASSWORD
@@ -30,21 +30,22 @@ workflows:
           storeFile=my-release-key.keystore
           EOF
 
-      - name: Build Release AAB
-        script: flutter build appbundle --release
-
-      - name: Print SHA-1 from Keystore
+      - name: 🔐 Print SHA-1 from Keystore
         script: |
-          echo "== SHA-1 fingerprint of Keystore =="
-          keytool -list -v -keystore android/app/my-release-key.keystore \
+          echo "== 🔐 SHA-1 from .keystore =="
+          $JAVA_HOME/bin/keytool -list -v \
+            -keystore android/app/my-release-key.keystore \
             -alias $CM_KEY_ALIAS \
             -storepass $CM_KEYSTORE_PASSWORD \
             -keypass $CM_KEY_PASSWORD | grep 'SHA1'
 
-      - name: Print Permanent SHA-1 from Environment
+      - name: 📄 Print Permanent SHA-1 from Environment
         script: |
-          echo "== Permanent SHA-1 (from env) =="
+          echo "== 📄 Permanent SHA-1 from Secret =="
           echo $ANDROID_SHA1_KEY
+
+      - name: 🏗️ Build Release AAB
+        script: flutter build appbundle --release
 
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
