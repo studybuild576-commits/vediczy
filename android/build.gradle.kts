@@ -7,7 +7,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        // Kotlin DSL mein, classpath ko is tarah likha jaata hai.
+        // Kotlin DSL mein classpath ko is tarah likhte hain
         classpath("com.google.gms:google-services:4.4.2")
         classpath("com.android.tools.build:gradle:8.3.0")
     }
@@ -20,6 +20,7 @@ allprojects {
     }
 }
 
+// Flutter aur Android build ko ek hi /build folder me rakhne ke liye
 val newBuildDir: Directory =
     rootProject.layout.buildDirectory
         .dir("../../build")
@@ -29,11 +30,12 @@ rootProject.layout.buildDirectory.value(newBuildDir)
 subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
-}
-subprojects {
+
+    // Make sure :app module is always evaluated
     project.evaluationDependsOn(":app")
 }
 
+// Clean task (gradle clean ke liye)
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
