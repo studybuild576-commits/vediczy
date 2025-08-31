@@ -1,11 +1,10 @@
 name: Verify SHA-1 Key
 
 on:
-  workflow_dispatch:  # 🖐️ Manual run from GitHub Actions UI
+  workflow_dispatch:
 
 jobs:
   sha1-check:
-    name: Print and Compare SHA-1 Fingerprint
     runs-on: ubuntu-latest
 
     env:
@@ -16,23 +15,37 @@ jobs:
       ANDROID_SHA1_KEY: ${{ secrets.ANDROID_SHA1_KEY }}
 
     steps:
-      - name: 📥 Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 🔐 Setup Keystore File
-        run: |
-          echo "$CM_KEYSTORE" | base64 --decode > my-release-key.keystore
+      - name: Decode keystore and save to a file
+        run: echo "$CM_KEYSTORE" | base64 --decode > my-release-key.jks
 
-      - name: 🔍 Print SHA-1 From Keystore
+      - name: Verify SHA-1 from Keystore
         run: |
-          echo "== 🔐 SHA-1 from actual .keystore =="
+          echo "🔐 SHA-1 from keystore:"
           keytool -list -v \
-            -keystore my-release-key.keystore \
+            -keystore my-release-key.jks \
             -alias "$CM_KEY_ALIAS" \
             -storepass "$CM_KEYSTORE_PASSWORD" \
-            -keypass "$CM_KEY_PASSWORD" | grep 'SHA1'
+            -keypass "$CM_KEY_PASSWORD" | grep SHA1
 
-      - name: 📄 Print SHA-1 from Secret (Permanent Key)
+      - name: Print Permanent SHA-1 from Secret
         run: |
-          echo "== 📄 Permanent SHA-1 from GitHub Secret =="
+          echo "📄 Permanent SHA-1 from secret:"
           echo "$ANDROID_SHA1_KEY"
+
+      - name: Compare SHA-1 Keys
+        run: |
+          KEYSTORE_SHA1=$(keytool -list -v -keystore my-release-key.jks -alias "$CM_KEY_ALIAS" -storepass "$CM_KEYSTORE_PASSWORD" -keypass "$CM_KEY_PASSWORD" | grep SHA1 | cut -d ' ' -f 3)
+          SECRET_SHA1="$ANDROID_SHA1_KEY"
+          
+          if [[ "$KEYSTORE_SHA1" == "$SECRET_SHA1" ]]; then
+            echo "✅ Success: Keystore SHA-1 matches the permanent key."
+            exit 0
+          else
+            echo "❌ Error: Keystore SHA-1 does not match the permanent key."
+            echo "Keystore SHA-1: $KEYSTORE_SHA1"
+            echo "Secret SHA-1: $SECRET_SHA1"
+            exit 1
+          fi
