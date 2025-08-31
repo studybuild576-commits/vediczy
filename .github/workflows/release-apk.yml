@@ -1,64 +1,39 @@
-name: Build and Sign APK
+name: Android Build and SHA1 Key
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
-  build-apk:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Setup Java (Zulu 17)
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: 'stable'
-          channel: 'stable'
+    - name: Decode permanent keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
 
-      - name: Decode keystore (.jks)
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+    - name: Generate SHA1 from permanent keystore
+      run: |
+        echo "🔐 Permanent SHA1 (from keystore):"
+        keytool -list -v \
+          -keystore android/app/upload-keystore.jks \
+          -alias "${{ secrets.KEY_ALIAS }}" \
+          -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
+          -keypass "${{ secrets.KEY_PASSWORD }}" \
+          | grep 'SHA1:'
 
-      - name: Create key.properties
-        run: |
-          echo "storeFile=upload-keystore.jks" > android/key.properties
-          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-
-      - name: Clean Gradle & Flutter Cache
-        run: flutter clean
-
-      - name: Show Permanent SHA‑1 key (from secret)
-        run: |
-          echo "🚀 Permanent SHA‑1 (Secret):"
-          echo "${{ secrets.PERMANENT_SHA1 }}"
-
-      - name: Verify actual SHA‑1 from decoded keystore
-        run: |
-          echo "🔍 Actual SHA‑1 from keystore:"
-          keytool -list -v \
-            -keystore android/app/upload-keystore.jks \
-            -alias "${{ secrets.KEY_ALIAS }}" \
-            -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
-            -keypass "${{ secrets.KEY_PASSWORD }}" | grep 'SHA1'
-
-      - name: Install Flutter dependencies
-        run: flutter pub get
-
-      - name: Build signed release APK
-        run: flutter build apk --release
-
-      - name: Upload release APK as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+    - name: Show expected SHA1 (from secret)
+      run: |
+        echo "✅ Expected SHA1 (from GitHub Secret):"
+        echo "${{ secrets.PERMANENT_SHA1 }}"
