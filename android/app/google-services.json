@@ -14,19 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "591156419005-1onoukji28v456ajhq63tnj64p04i0au.apps.googleusercontent.com",
+          "client_id": "591156419005-q3ctt5vjiq7qligrl9t5gu2k9hejcm1a.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.vediczy",
-            "certificate_hash": "4ac9065feaa5810c8ff8c4978965746f5ad2babb"
-          }
-        },
-        {
-          "client_id": "591156419005-spl1264i8mrajsq0ag32q5rasbn09mcg.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.vediczy",
-            "certificate_hash": "1e7a1cb15fbbb8962d89ef179ebea17103c03809"
+            "certificate_hash": "81ef9ee5cbbea2208f5f9ce23c8313c9240fb603"
           }
         },
         {
