@@ -1,10 +1,11 @@
-name: Print SHA-1 from Keystore
+name: Verify SHA-1 Key
 
 on:
-  workflow_dispatch:  # 🖐️ Manual trigger from GitHub UI
+  workflow_dispatch:  # 🖐️ Manual run from GitHub Actions UI
 
 jobs:
-  print-sha1:
+  sha1-check:
+    name: Print and Compare SHA-1 Fingerprint
     runs-on: ubuntu-latest
 
     env:
@@ -15,21 +16,23 @@ jobs:
       ANDROID_SHA1_KEY: ${{ secrets.ANDROID_SHA1_KEY }}
 
     steps:
-      - name: 📥 Checkout repository
+      - name: 📥 Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🛠️ Set up keystore
+      - name: 🔐 Setup Keystore File
         run: |
           echo "$CM_KEYSTORE" | base64 --decode > my-release-key.keystore
 
-      - name: 🔍 Print SHA-1 from Keystore
+      - name: 🔍 Print SHA-1 From Keystore
         run: |
-          echo "== Permanent SHA-1 (from env variable)=="
-          echo "$ANDROID_SHA1_KEY"
-
-          echo "== SHA-1 from actual .keystore file =="
+          echo "== 🔐 SHA-1 from actual .keystore =="
           keytool -list -v \
             -keystore my-release-key.keystore \
             -alias "$CM_KEY_ALIAS" \
             -storepass "$CM_KEYSTORE_PASSWORD" \
-            -keypass "$CM_KEY_PASSWORD" | grep SHA1
+            -keypass "$CM_KEY_PASSWORD" | grep 'SHA1'
+
+      - name: 📄 Print SHA-1 from Secret (Permanent Key)
+        run: |
+          echo "== 📄 Permanent SHA-1 from GitHub Secret =="
+          echo "$ANDROID_SHA1_KEY"
