@@ -7,6 +7,9 @@ workflows:
       java: 17
       vars:
         GRADLE_OPTS: -Xmx4096m -Dorg.gradle.jvmargs=-Xmx4096m
+        # Permanent SHA1 key (from your local keytool output)
+        ANDROID_SHA1_KEY: <paste-your-sha1-here-if-needed>
+
     scripts:
       - name: Setup gradle.properties
         script: |
@@ -38,7 +41,7 @@ workflows:
             -storepass $CM_KEYSTORE_PASSWORD \
             -keypass $CM_KEY_PASSWORD | grep 'SHA1'
 
-      - name: Print Permanent SHA1 from Environment
+      - name: Print Permanent SHA-1 from Environment
         script: |
           echo "== Permanent SHA-1 (from env) =="
           echo $ANDROID_SHA1_KEY
