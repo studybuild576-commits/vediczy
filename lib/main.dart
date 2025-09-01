@@ -369,10 +369,62 @@ class ExamSegmentsScreen extends StatelessWidget {
   }
 }
 
-// New Dashboard Screen
-class DashboardScreen extends StatelessWidget {
+// Updated Dashboard Screen with Banner Ad
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  BannerAd? _bannerAd;
+  Timer? _adRefreshTimer;
+  final String _adUnitId = "ca-app-pub-2036566646997333/3122845917";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBannerAd();
+    _startAdRefreshTimer();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd?.dispose();
+    _bannerAd = BannerAd(
+      adUnitId: _adUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          if (mounted) {
+            setState(() {
+              _bannerAd = ad as BannerAd;
+            });
+          }
+        },
+        onAdFailedToLoad: (ad, error) {
+          debugPrint('Dashboard BannerAd failed to load: $error');
+          ad.dispose();
+          _bannerAd = null;
+        },
+      ),
+    )..load();
+  }
+
+  void _startAdRefreshTimer() {
+    _adRefreshTimer = Timer.periodic(const Duration(seconds: 90), (timer) {
+      _loadBannerAd();
+    });
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    _adRefreshTimer?.cancel();
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -381,112 +433,125 @@ class DashboardScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: Stack(
+      body: Column(
         children: [
-          // Background Wallpaper
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/ssc_wallpaper.jpg'), // Add your wallpaper image here
-                fit: BoxFit.cover,
-              ),
+          // Banner Ad at the top
+          if (_bannerAd != null)
+            SizedBox(
+              width: _bannerAd!.size.width.toDouble(),
+              height: _bannerAd!.size.height.toDouble(),
+              child: AdWidget(ad: _bannerAd!),
             ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.white.withOpacity(0.9), Colors.white.withOpacity(0.7)],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
-          
-          // Content
-          Column(
-            children: [
-              // User Greeting Section
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.person, size: 40, color: Colors.deepPurple),
+          Expanded(
+            child: Stack(
+              children: [
+                // Background Wallpaper
+                Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/ssc_wallpaper.jpg'), // Add your wallpaper image here
+                      fit: BoxFit.cover,
                     ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'नमस्ते!',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black54,
-                            ),
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.white.withOpacity(0.9), Colors.white.withOpacity(0.7)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+                
+                // Content
+                Column(
+                  children: [
+                    // User Greeting Section
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Row(
+                        children: [
+                          const CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Colors.white,
+                            child: Icon(Icons.person, size: 40, color: Colors.deepPurple),
                           ),
-                          Text(
-                            'Vediczy में आपका स्वागत है।',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.deepPurple,
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text(
+                                  'नमस्ते!',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                                Text(
+                                  'Vediczy में आपका स्वागत है।',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.deepPurple,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
+                    
+                    // Exam Cards Section
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                        child: GridView.count(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 15,
+                          mainAxisSpacing: 15,
+                          children: const [
+                            ExamCard(
+                              title: 'SSC CGL',
+                              icon: Icons.school,
+                              color: Colors.blue,
+                            ),
+                            ExamCard(
+                              title: 'SSC CHSL',
+                              icon: Icons.school,
+                              color: Colors.green,
+                            ),
+                            ExamCard(
+                              title: 'SSC MTS',
+                              icon: Icons.school,
+                              color: Colors.orange,
+                            ),
+                            ExamCard(
+                              title: 'SSC GD',
+                              icon: Icons.school,
+                              color: Colors.red,
+                            ),
+                            ExamCard(
+                              title: 'SSC CPO',
+                              icon: Icons.school,
+                              color: Colors.purple,
+                            ),
+                            ExamCard(
+                              title: 'SSC Stenographer',
+                              icon: Icons.school,
+                              color: Colors.teal,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              
-              // Exam Cards Section
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 15,
-                    mainAxisSpacing: 15,
-                    children: const [
-                      ExamCard(
-                        title: 'SSC CGL',
-                        icon: Icons.school,
-                        color: Colors.blue,
-                      ),
-                      ExamCard(
-                        title: 'SSC CHSL',
-                        icon: Icons.school,
-                        color: Colors.green,
-                      ),
-                      ExamCard(
-                        title: 'SSC MTS',
-                        icon: Icons.school,
-                        color: Colors.orange,
-                      ),
-                      ExamCard(
-                        title: 'SSC GD',
-                        icon: Icons.school,
-                        color: Colors.red,
-                      ),
-                      ExamCard(
-                        title: 'SSC CPO',
-                        icon: Icons.school,
-                        color: Colors.purple,
-                      ),
-                      ExamCard(
-                        title: 'SSC Stenographer',
-                        icon: Icons.school,
-                        color: Colors.teal,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -571,10 +636,62 @@ class TestsScreen extends StatelessWidget {
   }
 }
 
-// New Revision Screen
-class RevisionScreen extends StatelessWidget {
+// Updated Revision Screen with Banner Ad
+class RevisionScreen extends StatefulWidget {
   const RevisionScreen({super.key});
 
+  @override
+  State<RevisionScreen> createState() => _RevisionScreenState();
+}
+
+class _RevisionScreenState extends State<RevisionScreen> {
+  BannerAd? _bannerAd;
+  Timer? _adRefreshTimer;
+  final String _adUnitId = "ca-app-pub-2036566646997333/3122845917";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBannerAd();
+    _startAdRefreshTimer();
+  }
+
+  void _loadBannerAd() {
+    _bannerAd?.dispose();
+    _bannerAd = BannerAd(
+      adUnitId: _adUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          if (mounted) {
+            setState(() {
+              _bannerAd = ad as BannerAd;
+            });
+          }
+        },
+        onAdFailedToLoad: (ad, error) {
+          debugPrint('Revision BannerAd failed to load: $error');
+          ad.dispose();
+          _bannerAd = null;
+        },
+      ),
+    )..load();
+  }
+
+  void _startAdRefreshTimer() {
+    _adRefreshTimer = Timer.periodic(const Duration(seconds: 90), (timer) {
+      _loadBannerAd();
+    });
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    _adRefreshTimer?.cancel();
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -582,8 +699,21 @@ class RevisionScreen extends StatelessWidget {
         title: const Text('Revision'),
         backgroundColor: Colors.deepPurple,
       ),
-      body: const Center(
-        child: Text('Here you can add your PDF files.'),
+      body: Column(
+        children: [
+          // Banner Ad at the top
+          if (_bannerAd != null)
+            SizedBox(
+              width: _bannerAd!.size.width.toDouble(),
+              height: _bannerAd!.size.height.toDouble(),
+              child: AdWidget(ad: _bannerAd!),
+            ),
+          const Expanded(
+            child: Center(
+              child: Text('Here you can add your PDF files.'),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -600,9 +730,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   BannerAd? _bannerAd;
   Timer? _adRefreshTimer;
-
-  // Use test ad unit ID for testing
-  final String _adUnitId = "ca-app-pub-3940256099942544/6300978111";
+  final String _adUnitId = "ca-app-pub-2036566646997333/3122845917";
 
   @override
   void initState() {
@@ -612,9 +740,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _loadBannerAd() {
-    // Clear the old ad before loading a new one
     _bannerAd?.dispose();
-
     _bannerAd = BannerAd(
       adUnitId: _adUnitId,
       request: const AdRequest(),
@@ -628,7 +754,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
         },
         onAdFailedToLoad: (ad, error) {
-          debugPrint('BannerAd failed to load: $error');
+          debugPrint('Profile BannerAd failed to load: $error');
           ad.dispose();
           _bannerAd = null;
         },
@@ -637,7 +763,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _startAdRefreshTimer() {
-    // Refresh the ad every 60-120 seconds (1-2 minutes)
     _adRefreshTimer = Timer.periodic(const Duration(seconds: 90), (timer) {
       _loadBannerAd();
     });
@@ -664,7 +789,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Column(
         children: [
-          // Banner Ad
+          // Banner Ad at the top
           if (_bannerAd != null)
             SizedBox(
               width: _bannerAd!.size.width.toDouble(),
