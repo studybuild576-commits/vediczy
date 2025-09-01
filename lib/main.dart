@@ -3,11 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-// Please make sure 'google_sign_in_page.dart' file
-// 'lib/screens' folder ke andar hi saved hai.
-// If you want to use the full code in a single file, you can move the content of 'google_sign_in_page.dart' here.
-// For demonstration, I will include the content of the GoogleSignInPage here.
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'dart:async';
 
 // Your GoogleSignInPage code here
 class GoogleSignInPage extends StatelessWidget {
@@ -37,146 +34,22 @@ class GoogleSignInPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Google Sign-In'),
+        backgroundColor: Colors.deepPurple,
       ),
       body: Center(
         child: ElevatedButton(
           onPressed: _signInWithGoogle,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+          ),
           child: const Text('Sign in with Google'),
         ),
       ),
     );
   }
 }
-// End of GoogleSignInPage code
-
-// Dashboard Screen
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
-
-  Future<void> _signOut() async {
-    await FirebaseAuth.instance.signOut();
-    await GoogleSignIn().signOut();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('SSC Exams'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _signOut,
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            _buildExamCard(context, 'SSC CGL'),
-            _buildExamCard(context, 'SSC CHSL'),
-            _buildExamCard(context, 'SSC GD'),
-            _buildExamCard(context, 'SSC MTS'),
-            _buildExamCard(context, 'SSC CPO'),
-            // Add more exams as needed
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildExamCard(BuildContext context, String examName) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        title: Text(
-          examName,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.blue),
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => ExamSegmentsScreen(examName: examName)),
-          );
-        },
-      ),
-    );
-  }
-}
-
-// Exam Segments Screen
-class ExamSegmentsScreen extends StatelessWidget {
-  final String examName;
-
-  const ExamSegmentsScreen({super.key, required this.examName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(examName),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildSegmentCard(context, 'Model Test', Colors.lightBlue),
-            _buildSegmentCard(context, 'PYQ Test', Colors.teal),
-            _buildSegmentCard(context, 'Revision', Colors.orange),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSegmentCard(BuildContext context, String segmentName, Color color) {
-    return Expanded(
-      child: Card(
-        elevation: 6,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        margin: const EdgeInsets.symmetric(vertical: 12),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            // Navigate to CBT Test screen
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => CbtTestScreen(
-                  title: '$segmentName for $examName',
-                ),
-              ),
-            );
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Center(
-              child: Text(
-                segmentName,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 
 // CBT Test Screen
 class CbtTestScreen extends StatefulWidget {
@@ -430,10 +303,388 @@ class _CbtTestScreenState extends State<CbtTestScreen> {
     );
   }
 }
-// End of CBT Test Screen
 
+// Exam Segments Screen
+class ExamSegmentsScreen extends StatelessWidget {
+  final String examName;
 
-// Splash Screen - This is needed to avoid import errors
+  const ExamSegmentsScreen({super.key, required this.examName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(examName),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _buildSegmentCard(context, 'Model Test', Colors.lightBlue),
+            _buildSegmentCard(context, 'PYQ Test', Colors.teal),
+            _buildSegmentCard(context, 'Revision', Colors.orange),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSegmentCard(BuildContext context, String segmentName, Color color) {
+    return Expanded(
+      child: Card(
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        margin: const EdgeInsets.symmetric(vertical: 12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            // Navigate to CBT Test screen
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => CbtTestScreen(
+                  title: '$segmentName for $examName',
+                ),
+              ),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Center(
+              child: Text(
+                segmentName,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// New Dashboard Screen
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Dashboard'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: Stack(
+        children: [
+          // Background Wallpaper
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/ssc_wallpaper.jpg'), // Add your wallpaper image here
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.white.withOpacity(0.9), Colors.white.withOpacity(0.7)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
+          
+          // Content
+          Column(
+            children: [
+              // User Greeting Section
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Row(
+                  children: [
+                    const CircleAvatar(
+                      radius: 30,
+                      backgroundColor: Colors.white,
+                      child: Icon(Icons.person, size: 40, color: Colors.deepPurple),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            'नमस्ते!',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          Text(
+                            'Vediczy में आपका स्वागत है।',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepPurple,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Exam Cards Section
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
+                    children: const [
+                      ExamCard(
+                        title: 'SSC CGL',
+                        icon: Icons.school,
+                        color: Colors.blue,
+                      ),
+                      ExamCard(
+                        title: 'SSC CHSL',
+                        icon: Icons.school,
+                        color: Colors.green,
+                      ),
+                      ExamCard(
+                        title: 'SSC MTS',
+                        icon: Icons.school,
+                        color: Colors.orange,
+                      ),
+                      ExamCard(
+                        title: 'SSC GD',
+                        icon: Icons.school,
+                        color: Colors.red,
+                      ),
+                      ExamCard(
+                        title: 'SSC CPO',
+                        icon: Icons.school,
+                        color: Colors.purple,
+                      ),
+                      ExamCard(
+                        title: 'SSC Stenographer',
+                        icon: Icons.school,
+                        color: Colors.teal,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ExamCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color color;
+
+  const ExamCard({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: [color.withOpacity(0.8), color],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => ExamSegmentsScreen(examName: title)),
+            );
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 50,
+                color: Colors.white,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// New Test Screen
+class TestsScreen extends StatelessWidget {
+  const TestsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('All Tests'),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: const Center(
+        child: Text('Here will be all the tests for different exams.'),
+      ),
+    );
+  }
+}
+
+// New Revision Screen
+class RevisionScreen extends StatelessWidget {
+  const RevisionScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Revision'),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: const Center(
+        child: Text('Here you can add your PDF files.'),
+      ),
+    );
+  }
+}
+
+// New Profile Screen
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
+  Future<void> _signOut() async {
+    await FirebaseAuth.instance.signOut();
+    await GoogleSignIn().signOut();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('My Profile'),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Profile information and test analysis will be here.'),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _signOut,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Sign Out'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// New AppShell to handle bottom navigation
+class AppShell extends StatefulWidget {
+  const AppShell({super.key});
+
+  @override
+  _AppShellState createState() => _AppShellState();
+}
+
+class _AppShellState extends State<AppShell> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _widgetOptions = <Widget>[
+    const DashboardScreen(),
+    const TestsScreen(),
+    const RevisionScreen(),
+    const ProfileScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.class_),
+            label: 'Tests',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.library_books),
+            label: 'Revision',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.deepPurple,
+        unselectedItemColor: Colors.grey,
+        onTap: _onItemTapped,
+      ),
+    );
+  }
+}
+
+// New Splash Screen with AdMob
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -442,35 +693,103 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  InterstitialAd? _interstitialAd;
+  final String _adUnitId = "ca-app-pub-2036566646997333/2931274226";
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const AuthWrapper()),
-      );
-    });
+    _loadAd();
+  }
+
+  void _loadAd() {
+    InterstitialAd.load(
+      adUnitId: _adUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (InterstitialAd ad) {
+          debugPrint('$ad loaded.');
+          _interstitialAd = ad;
+          _showAd();
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          debugPrint('InterstitialAd failed to load: $error');
+          _navigateToNextScreen();
+        },
+      ),
+    );
+  }
+
+  void _showAd() {
+    if (_interstitialAd == null) {
+      _navigateToNextScreen();
+      return;
+    }
+
+    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (InterstitialAd ad) {
+        ad.dispose();
+        _navigateToNextScreen();
+      },
+      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+        ad.dispose();
+        _navigateToNextScreen();
+      },
+    );
+
+    _interstitialAd!.show();
+    _interstitialAd = null;
+  }
+
+  void _navigateToNextScreen() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const AuthWrapper()),
+    );
+  }
+
+  @override
+  void dispose() {
+    _interstitialAd?.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // You can add your app logo here
-            const FlutterLogo(size: 150),
-            const SizedBox(height: 20),
-            const Text(
-              'SSC Education App',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF6A1B9A),
+              Color(0xFF4527A0),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Welcome',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
-            ),
-          ],
+              SizedBox(height: 10),
+              Text(
+                'Vediczy',
+                style: TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -482,6 +801,7 @@ class _SplashScreenState extends State<SplashScreen> {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await MobileAds.instance.initialize(); // Initialize AdMob
   runApp(const MyApp());
 }
 
@@ -496,7 +816,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const AuthWrapper(),
+      home: const SplashScreen(),
     );
   }
 }
@@ -515,7 +835,7 @@ class AuthWrapper extends StatelessWidget {
           );
         }
         if (snapshot.hasData) {
-          return const DashboardScreen();
+          return const AppShell();
         }
         return const GoogleSignInPage();
       },
