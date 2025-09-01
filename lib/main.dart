@@ -589,9 +589,66 @@ class RevisionScreen extends StatelessWidget {
   }
 }
 
-// New Profile Screen
-class ProfileScreen extends StatelessWidget {
+// Updated Profile Screen with Banner Ad
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  BannerAd? _bannerAd;
+  Timer? _adRefreshTimer;
+
+  // Use test ad unit ID for testing
+  final String _adUnitId = "ca-app-pub-3940256099942544/6300978111";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBannerAd();
+    _startAdRefreshTimer();
+  }
+
+  void _loadBannerAd() {
+    // Clear the old ad before loading a new one
+    _bannerAd?.dispose();
+
+    _bannerAd = BannerAd(
+      adUnitId: _adUnitId,
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          if (mounted) {
+            setState(() {
+              _bannerAd = ad as BannerAd;
+            });
+          }
+        },
+        onAdFailedToLoad: (ad, error) {
+          debugPrint('BannerAd failed to load: $error');
+          ad.dispose();
+          _bannerAd = null;
+        },
+      ),
+    )..load();
+  }
+
+  void _startAdRefreshTimer() {
+    // Refresh the ad every 60-120 seconds (1-2 minutes)
+    _adRefreshTimer = Timer.periodic(const Duration(seconds: 90), (timer) {
+      _loadBannerAd();
+    });
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    _adRefreshTimer?.cancel();
+    super.dispose();
+  }
 
   Future<void> _signOut() async {
     await FirebaseAuth.instance.signOut();
@@ -605,22 +662,36 @@ class ProfileScreen extends StatelessWidget {
         title: const Text('My Profile'),
         backgroundColor: Colors.deepPurple,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Profile information and test analysis will be here.'),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _signOut,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Sign Out'),
+      body: Column(
+        children: [
+          // Banner Ad
+          if (_bannerAd != null)
+            SizedBox(
+              width: _bannerAd!.size.width.toDouble(),
+              height: _bannerAd!.size.height.toDouble(),
+              child: AdWidget(ad: _bannerAd!),
             ),
-          ],
-        ),
+          
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Profile information and test analysis will be here.'),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _signOut,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text('Sign Out'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -684,7 +755,7 @@ class _AppShellState extends State<AppShell> {
   }
 }
 
-// New Splash Screen with AdMob
+// New Splash Screen with Interstitial Ad
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -694,11 +765,14 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   InterstitialAd? _interstitialAd;
-  final String _adUnitId = "ca-app-pub-2036566646997333/2931274226";
+  
+  // Use a test ad unit ID for testing
+  final String _adUnitId = "ca-app-pub-3940256099942544/1033173712";
 
   @override
   void initState() {
     super.initState();
+    // Load the ad when the screen is initialized
     _loadAd();
   }
 
@@ -710,10 +784,12 @@ class _SplashScreenState extends State<SplashScreen> {
         onAdLoaded: (InterstitialAd ad) {
           debugPrint('$ad loaded.');
           _interstitialAd = ad;
+          // Show the ad once it's loaded
           _showAd();
         },
         onAdFailedToLoad: (LoadAdError error) {
           debugPrint('InterstitialAd failed to load: $error');
+          // If ad fails to load, navigate to the next screen immediately
           _navigateToNextScreen();
         },
       ),
