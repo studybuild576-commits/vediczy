@@ -41,43 +41,6 @@
           ]
         }
       }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:591156419005:android:b5fb5bef09962200e55ad4",
-        "android_client_info": {
-          "package_name": "com.vediczy.app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "591156419005-ejov8hclucfb7qrg4spa39ic1pg0s0c7.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.vediczy.app",
-            "certificate_hash": "69111ffcbb35040b7c25f93bb184bdc62b2539ab"
-          }
-        },
-        {
-          "client_id": "591156419005-g58p84e2d8jsskj4727ehrfdgaj7qn42.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAobuTyRJ6lp8XugvWVgszjgynCTDyByE4"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "591156419005-g58p84e2d8jsskj4727ehrfdgaj7qn42.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
     }
   ],
   "configuration_version": "1"
