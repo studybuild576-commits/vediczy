@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'dart:async';
 
-// Your GoogleSignInPage code here
+// Google Sign-In Page
 class GoogleSignInPage extends StatelessWidget {
   const GoogleSignInPage({super.key});
 
@@ -880,7 +880,7 @@ class _AppShellState extends State<AppShell> {
   }
 }
 
-// New Splash Screen with Interstitial Ad
+// Updated Splash Screen with Interstitial Ad
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -891,13 +891,12 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   InterstitialAd? _interstitialAd;
   
-  // Use a test ad unit ID for testing
-  final String _adUnitId = "ca-app-pub-3940256099942544/1033173712";
+  // Splash Screen के लिए नया Ad Unit ID
+  final String _adUnitId = "ca-app-pub-2036566646997333/2931274226";
 
   @override
   void initState() {
     super.initState();
-    // Load the ad when the screen is initialized
     _loadAd();
   }
 
@@ -909,12 +908,10 @@ class _SplashScreenState extends State<SplashScreen> {
         onAdLoaded: (InterstitialAd ad) {
           debugPrint('$ad loaded.');
           _interstitialAd = ad;
-          // Show the ad once it's loaded
           _showAd();
         },
         onAdFailedToLoad: (LoadAdError error) {
           debugPrint('InterstitialAd failed to load: $error');
-          // If ad fails to load, navigate to the next screen immediately
           _navigateToNextScreen();
         },
       ),
