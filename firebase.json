@@ -1,1 +1,53 @@
-{"hosting":{"public":"y","ignore":["firebase.json","**/.*","**/node_modules/**"],"rewrites":[{"source":"**","destination":"/index.html"}]},"flutter":{"platforms":{"android":{"default":{"projectId":"r2examprep","appId":"1:591156419005:android:7b4db51894cd47f5e55ad4","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"r2examprep","configurations":{"android":"1:591156419005:android:7b4db51894cd47f5e55ad4","ios":"1:591156419005:ios:1b255e7790811c7de55ad4","macos":"1:591156419005:ios:1b255e7790811c7de55ad4","web":"1:591156419005:web:fed268823324819ee55ad4","windows":"1:591156419005:web:7148c5be912f75c1e55ad4"}}}}}}
+{
+  "hosting": {
+    "public": "y",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "functions": {
+    "source": "functions"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "r2examprep",
+          "appId": "1:591156419005:android:7b4db51894cd47f5e55ad4",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "r2examprep",
+          "configurations": {
+            "android": "1:591156419005:android:7b4db51894cd47f5e55ad4",
+            "ios": "1:591156419005:ios:1b255e7790811c7de55ad4",
+            "macos": "1:591156419005:ios:1b255e7790811c7de55ad4",
+            "web": "1:591156419005:web:fed268823324819ee55ad4",
+            "windows": "1:591156419005:web:7148c5be912f75c1e55ad4"
+          }
+        }
+      }
+    }
+  }
+}
+```
+eof
+
+---
+
+### **अगले कदम**
+
+1.  **फ़ाइल को edit करें:** CodeSpaces में अपनी `firebase.json` फ़ाइल खोलें और उसमें `functions` का section जोड़ें।
+2.  **फिर से push करें:** एक बार जब आप फ़ाइल को save कर लें, तो `git` कमांड्स को फिर से चलाएं:
+
+    ```bash
+    git add .
+    git commit -m "feat: Add functions configuration to firebase.json"
+    git push origin main
+    
