@@ -1,65 +1,88 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:vediczy/screens/exam_segments_screen.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:vediczy/screens/dashboard_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
-
-  Future<void> _signOut() async {
-    await FirebaseAuth.instance.signOut();
-    await GoogleSignIn().signOut();
-  }
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('SSC Exams'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _signOut,
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            _buildExamCard(context, 'SSC CGL'),
-            _buildExamCard(context, 'SSC CHSL'),
-            _buildExamCard(context, 'SSC GD'),
-            _buildExamCard(context, 'SSC MTS'),
-            _buildExamCard(context, 'SSC CPO'),
-            // Add more exams as needed
-          ],
-        ),
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  InterstitialAd? _interstitialAd;
+  final String _adUnitId = 'ca-app-pub-2036566646997333/2931274226'; // Your Interstitial Ad Unit ID
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAd();
+  }
+
+  void _loadAd() {
+    InterstitialAd.load(
+      adUnitId: _adUnitId,
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (InterstitialAd ad) {
+          _interstitialAd = ad;
+          _showAd();
+        },
+        onAdFailedToLoad: (LoadAdError error) {
+          _interstitialAd = null;
+          _navigateToNextScreen();
+        },
       ),
     );
   }
 
-  Widget _buildExamCard(BuildContext context, String examName) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        title: Text(
-          examName,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.blue),
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => ExamSegmentsScreen(examName: examName)),
-          );
+  void _showAd() {
+    if (_interstitialAd != null) {
+      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+        onAdDismissedFullScreenContent: (InterstitialAd ad) {
+          ad.dispose();
+          _navigateToNextScreen();
         },
+        onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+          ad.dispose();
+          _navigateToNextScreen();
+        },
+      );
+      _interstitialAd!.show();
+    }
+  }
+
+  void _navigateToNextScreen() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => const DashboardScreen()),
+    );
+  }
+
+  @override
+  void dispose() {
+    _interstitialAd?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            FlutterLogo(size: 150),
+            SizedBox(height: 20),
+            Text(
+              'SSC Education App',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
