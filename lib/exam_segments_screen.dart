@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'cbt_test_screen.dart';
+import 'package:vediczy/screens/cbt_test_screen.dart';
 
 class ExamSegmentsScreen extends StatelessWidget {
   final String examName;
