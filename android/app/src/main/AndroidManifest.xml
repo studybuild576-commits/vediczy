@@ -4,7 +4,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
-        <!-- यहाँ AdMob App ID जोड़ें -->
+        <!-- AdMob App ID को यहाँ जोड़ें, activity टैग से पहले -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-2036566646997333~4449737005"/>
@@ -49,5 +49,3 @@
         </intent>
     </queries>
 </manifest>
-
-अब, आपकी App ID पूरी तरह से `AndroidManifest.xml` फ़ाइल में जुड़ चुकी है। यह आपकी ऐप में AdMob को सही तरह से initialize करने के लिए ज़रूरी है।
