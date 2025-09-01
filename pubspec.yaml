@@ -28,6 +28,8 @@ dependencies:
   http: ^1.1.1
   # Cron / scheduling (optional Flutter-side)
   cron: ^0.3.0
+  # Google Mobile Ads SDK
+  google_mobile_ads: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -38,8 +40,8 @@ flutter:
   uses-material-design: true
 
   # Add your assets here
-  # assets:
-  #   - images/
+  assets:
+    - assets/
   
   # Add your fonts here
   # fonts:
