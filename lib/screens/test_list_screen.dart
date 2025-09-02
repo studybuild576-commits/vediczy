@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/exam.dart';
-import 'test_screen.dart';
+import 'realistic_cbt_test_screen.dart'; // Nayi screen ka import
 
 class TestListScreen extends StatelessWidget {
   final Exam exam;
@@ -28,7 +28,7 @@ class TestListScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => TestScreen(exam: exam, testType: testType),
+                  builder: (_) => const RealisticCBTTestScreen(),
                 ),
               );
             },
