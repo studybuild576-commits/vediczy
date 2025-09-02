@@ -25,7 +25,6 @@ class GoogleSignInPage extends StatelessWidget {
       await FirebaseAuth.instance.signInWithCredential(credential);
     } catch (e) {
       print(e);
-      // Handle the error (e.g., show a snackbar)
     }
   }
 
@@ -78,7 +77,6 @@ class QuestionModel {
 class _CbtTestScreenState extends State<CbtTestScreen> {
   final PageController _pageController = PageController();
   int _currentQuestionIndex = 0;
-  final int _totalQuestions = 3;
 
   final List<QuestionModel> _questions = [
     QuestionModel(
@@ -131,11 +129,11 @@ class _CbtTestScreenState extends State<CbtTestScreen> {
 
   Color _getQuestionStatusColor(int index) {
     if (_questions[index].isMarkedForReview) {
-      return Colors.purple; // Marked for Review
+      return Colors.purple;
     } else if (_questions[index].userSelectedOptionIndex != -1) {
-      return Colors.green; // Answered
+      return Colors.green;
     }
-    return Colors.grey; // Not Answered
+    return Colors.grey;
   }
 
   void _showTestSubmitDialog() {
@@ -183,7 +181,6 @@ class _CbtTestScreenState extends State<CbtTestScreen> {
       ),
       body: Row(
         children: [
-          // Left panel for questions
           Container(
             width: 100,
             color: Colors.grey[200],
@@ -216,7 +213,6 @@ class _CbtTestScreenState extends State<CbtTestScreen> {
               },
             ),
           ),
-          // Right panel for the current question
           Expanded(
             child: PageView.builder(
               controller: _pageController,
@@ -338,7 +334,6 @@ class ExamSegmentsScreen extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            // Navigate to CBT Test screen
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => CbtTestScreen(
@@ -369,7 +364,7 @@ class ExamSegmentsScreen extends StatelessWidget {
   }
 }
 
-// Updated Dashboard Screen with Banner Ad
+// Dashboard Screen with Banner Ad
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -424,7 +419,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _adRefreshTimer?.cancel();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -435,7 +430,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       body: Column(
         children: [
-          // Banner Ad at the top
           if (_bannerAd != null)
             SizedBox(
               width: _bannerAd!.size.width.toDouble(),
@@ -445,11 +439,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Expanded(
             child: Stack(
               children: [
-                // Background Wallpaper
                 Container(
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage('assets/ssc_wallpaper.jpg'), // Add your wallpaper image here
+                      image: AssetImage('assets/ssc_wallpaper.jpg'),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -463,11 +456,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                 ),
-                
-                // Content
                 Column(
                   children: [
-                    // User Greeting Section
                     Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Row(
@@ -504,8 +494,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ],
                       ),
                     ),
-                    
-                    // Exam Cards Section
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
@@ -618,7 +606,7 @@ class ExamCard extends StatelessWidget {
   }
 }
 
-// New Test Screen
+// Tests Screen
 class TestsScreen extends StatelessWidget {
   const TestsScreen({super.key});
 
@@ -636,7 +624,7 @@ class TestsScreen extends StatelessWidget {
   }
 }
 
-// Updated Revision Screen with Banner Ad
+// Revision Screen with Banner Ad
 class RevisionScreen extends StatefulWidget {
   const RevisionScreen({super.key});
 
@@ -691,7 +679,7 @@ class _RevisionScreenState extends State<RevisionScreen> {
     _adRefreshTimer?.cancel();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -701,7 +689,6 @@ class _RevisionScreenState extends State<RevisionScreen> {
       ),
       body: Column(
         children: [
-          // Banner Ad at the top
           if (_bannerAd != null)
             SizedBox(
               width: _bannerAd!.size.width.toDouble(),
@@ -719,7 +706,7 @@ class _RevisionScreenState extends State<RevisionScreen> {
   }
 }
 
-// Updated Profile Screen with Banner Ad
+// Profile Screen with Banner Ad and Navigation
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -789,14 +776,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Column(
         children: [
-          // Banner Ad at the top
           if (_bannerAd != null)
             SizedBox(
               width: _bannerAd!.size.width.toDouble(),
               height: _bannerAd!.size.height.toDouble(),
               child: AdWidget(ad: _bannerAd!),
             ),
-          
           Expanded(
             child: Center(
               child: Column(
@@ -812,6 +797,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     child: const Text('Sign Out'),
                   ),
+                  const SizedBox(height: 20),
+                  // New navigation buttons
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const DashboardScreen()));
+                    },
+                    child: const Text('Go to Dashboard'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const TestsScreen()));
+                    },
+                    child: const Text('Go to Tests'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const RevisionScreen()));
+                    },
+                    child: const Text('Go to Revision'),
+                  ),
                 ],
               ),
             ),
@@ -822,7 +827,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 }
 
-// New AppShell to handle bottom navigation
+// AppShell
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
@@ -880,7 +885,7 @@ class _AppShellState extends State<AppShell> {
   }
 }
 
-// Updated Splash Screen with Interstitial Ad
+// Splash Screen with Interstitial Ad
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -890,8 +895,6 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   InterstitialAd? _interstitialAd;
-  
-  // Splash Screen के लिए नया Ad Unit ID
   final String _adUnitId = "ca-app-pub-2036566646997333/2931274226";
 
   @override
@@ -994,12 +997,10 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-// End of Splash Screen
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await MobileAds.instance.initialize(); // Initialize AdMob
+  await MobileAds.instance.initialize();
   runApp(const MyApp());
 }
 
