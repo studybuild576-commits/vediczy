@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: const HomeScreen(),
+      home: HomeScreen(),  // const hata diya hai
     );
   }
 }
