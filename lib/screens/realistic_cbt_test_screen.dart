@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 
 void main() {
@@ -26,30 +24,28 @@ class CBTRealisticScreen extends StatefulWidget {
 }
 
 class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
-  // Sample questions with file details & images
   final List<Map<String, dynamic>> questions = [
     {
       'id': 1,
       'question': 'Which article of the Indian Constitution deals with Right to Equality?',
-      'fileName': 'file1.pdf',   // File name (details)
-      'image': 'assets/images/file_icon.png', // Placeholder image path
+      'fileName': 'file1.pdf',
+      'image': 'assets/images/file_icon.png',
       'options': ['Article 19', 'Article 21', 'Article 14', 'Article 370']
     },
     {
       'id': 2,
       'question': 'Who is the current President of India?',
-      'fileName': 'president_bio.pdf',   // File name
-      'image': 'assets/images/file_icon.png', // Placeholder image
+      'fileName': 'president_bio.pdf',
+      'image': 'assets/images/file_icon.png',
       'options': ['Ram Nath Kovind', 'Droupadi Murmu', 'APJ Abdul Kalam', 'Pranab Mukherjee']
     },
-    // Add more questions as needed
   ];
 
   int currentQ = 0;
-  Map<int, String> answers = {}; // questionID -> answer
-  Map<int, bool> markedReview = {}; // questionID -> mark review
+  Map<int, String> answers = {};
+  Map<int, bool> markedReview = {};
   late Timer timer;
-  Duration timeLeft = Duration(minutes: 15); // 15 min timer
+  Duration timeLeft = Duration(minutes: 15);
 
   @override
   void initState() {
@@ -80,7 +76,6 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Reset or navigate
             },
             child: Text('OK'),
           ),
@@ -148,7 +143,6 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Timer Badge
                 buildTimerBadge(),
                 Text(
                   'Q${currentQ + 1}/${questions.length}',
@@ -168,7 +162,6 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
               // File & Question Details
               Row(
                 children: [
-                  // File Icon & Name
                   Image.asset('assets/images/file_icon.png', width: 40, height: 40),
                   SizedBox(width: 10),
                   Expanded(
@@ -186,7 +179,7 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
                 ],
               ),
               SizedBox(height: 20),
-              // Question Text
+              // Question Card
               buildQuestionCard('Q${currentQ + 1}: ${question['question']}'),
               SizedBox(height: 20),
               // Options
@@ -253,7 +246,7 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
           icon: Icon(Icons.arrow_back),
           label: Text('Previous'),
           style: ElevatedButton.styleFrom(
-            primary: Colors.grey.shade700,
+            backgroundColor: Colors.grey.shade700,
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
         ),
@@ -262,7 +255,7 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
           icon: Icon(Icons.arrow_forward),
           label: Text('Next'),
           style: ElevatedButton.styleFrom(
-            primary: Colors.blueAccent,
+            backgroundColor: Colors.blueAccent,
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
         ),
@@ -271,7 +264,7 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
           icon: Icon(Icons.check),
           label: Text('Submit'),
           style: ElevatedButton.styleFrom(
-            primary: Colors.green,
+            backgroundColor: Colors.green,
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
         ),
