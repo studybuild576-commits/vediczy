@@ -1,6 +1,27 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'SSC MOCK TEST',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        fontFamily: 'Arial',
+      ),
+      // Here, we call the CBTRealisticScreen class.
+      home: const CBTRealisticScreen(),
+    );
+  }
+}
+
 class CBTRealisticScreen extends StatefulWidget {
   const CBTRealisticScreen({Key? key}) : super(key: key);
 
@@ -128,11 +149,8 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
           ),
         ),
         actions: [
-          // Timer Badge ko yahan display kiya gaya hai
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: buildTimerBadge(),
-          ),
+          buildTimerBadge(),
+          const SizedBox(width: 16),
         ],
       ),
       body: SingleChildScrollView(
