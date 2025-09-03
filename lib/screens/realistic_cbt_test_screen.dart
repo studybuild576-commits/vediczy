@@ -1,245 +1,304 @@
-import 'dart:async';
+
+
 import 'package:flutter/material.dart';
 
-class RealisticCBTTestScreen extends StatefulWidget {
-  const RealisticCBTTestScreen({super.key});
-
-  @override
-  _RealisticCBTTestScreenState createState() => _RealisticCBTTestScreenState();
+void main() {
+  runApp(MyApp());
 }
 
-class _RealisticCBTTestScreenState extends State<RealisticCBTTestScreen> {
-  int currentQuestionIndex = 0;
-  bool isHindi = false;
-  bool markForReview = false;
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'SSC MOCK TEST',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        fontFamily: 'Arial', // Aap apne custom font bhi use kar sakte hain
+      ),
+      home: CBTRealisticScreen(),
+    );
+  }
+}
 
-  late Timer _timer;
-  Duration timeLeft = const Duration(minutes: 30);
+class CBTRealisticScreen extends StatefulWidget {
+  @override
+  _CBTRealisticScreenState createState() => _CBTRealisticScreenState();
+}
 
-  final List<String> questions = [
-    'What is 2 + 2?',
-    'What is the capital of India?',
+class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
+  // Sample questions with file details & images
+  final List<Map<String, dynamic>> questions = [
+    {
+      'id': 1,
+      'question': 'Which article of the Indian Constitution deals with Right to Equality?',
+      'fileName': 'file1.pdf',   // File name (details)
+      'image': 'assets/images/file_icon.png', // Placeholder image path
+      'options': ['Article 19', 'Article 21', 'Article 14', 'Article 370']
+    },
+    {
+      'id': 2,
+      'question': 'Who is the current President of India?',
+      'fileName': 'president_bio.pdf',   // File name
+      'image': 'assets/images/file_icon.png', // Placeholder image
+      'options': ['Ram Nath Kovind', 'Droupadi Murmu', 'APJ Abdul Kalam', 'Pranab Mukherjee']
+    },
+    // Add more questions as needed
   ];
 
-  final List<List<String>> options = [
-    ['1', '2', '3', '4'],
-    ['New Delhi', 'Mumbai', 'Chennai', 'Kolkata'],
-  ];
-
-  List<int?> selectedOptions = [];
+  int currentQ = 0;
+  Map<int, String> answers = {}; // questionID -> answer
+  Map<int, bool> markedReview = {}; // questionID -> mark review
+  late Timer timer;
+  Duration timeLeft = Duration(minutes: 15); // 15 min timer
 
   @override
   void initState() {
     super.initState();
-    selectedOptions = List.filled(questions.length, null);
-    _startTimer();
+    startTimer();
   }
 
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+  void startTimer() {
+    timer = Timer.periodic(Duration(seconds: 1), (_) {
       if (timeLeft.inSeconds == 0) {
         timer.cancel();
-        _submitTest();
+        showResult();
       } else {
         setState(() {
-          timeLeft = timeLeft - const Duration(seconds: 1);
+          timeLeft -= Duration(seconds: 1);
         });
       }
     });
   }
 
-  void _submitTest() {
-    _timer.cancel();
+  void showResult() {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Test Submitted'),
-        content: Text('You answered ${selectedOptions.where((e) => e != null).length} questions.'),
+        title: Text('Test Finished!'),
+        content: Text('Your answers: ${answers.toString()}'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK')),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Reset or navigate
+            },
+            child: Text('OK'),
+          ),
         ],
       ),
     );
   }
 
-  String _formatTime(Duration duration) {
-    final min = duration.inMinutes.toString().padLeft(2, '0');
-    final sec = (duration.inSeconds % 60).toString().padLeft(2, '0');
-    return '$min:$sec';
+  String getFormattedTime() {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    final minutes = twoDigits(timeLeft.inMinutes.remainder(60));
+    final seconds = twoDigits(timeLeft.inSeconds.remainder(60));
+    return "$minutes:$seconds";
   }
 
-  void _onOptionSelected(int optionIndex) {
+  void selectOption(String option) {
     setState(() {
-      selectedOptions[currentQuestionIndex] = optionIndex;
+      answers[questions[currentQ]['id']] = option;
     });
   }
 
-  void _toggleLanguage(bool value) {
-    setState(() {
-      isHindi = value;
-    });
+  void goNext() {
+    if (currentQ < questions.length - 1) {
+      setState(() {
+        currentQ++;
+      });
+    }
   }
 
-  void _toggleMarkForReview(bool value) {
-    setState(() {
-      markForReview = value;
-    });
+  void goPrevious() {
+    if (currentQ > 0) {
+      setState(() {
+        currentQ--;
+      });
+    }
   }
 
-  void _goToQuestion(int index) {
+  void toggleMark() {
+    int qID = questions[currentQ]['id'];
     setState(() {
-      currentQuestionIndex = index;
-      markForReview = false; // Adjust as required for actual mark for review tracking
+      markedReview[qID] = !(markedReview[qID] ?? false);
     });
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    timer.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = const Color(0xFF0D47A1); // Dark Blue
-    final answeredColor = const Color(0xFF4CAF50); // Green
-    final reviewColor = const Color(0xFFFFA000); // Orange Amber
-    final notVisitedColor = const Color(0xFF9E9E9E); // Grey
+    final question = questions[currentQ];
 
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: primaryColor,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text('Sectional Test'),
-            Row(
-              children: [
-                const Text('English', style: TextStyle(fontSize: 14)),
-                Switch(
-                    value: isHindi,
-                    onChanged: _toggleLanguage,
-                    activeColor: primaryColor),
-                const Text('Hindi', style: TextStyle(fontSize: 14)),
-              ],
-            ),
-          ],
-        ),
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(16),
-        color: Colors.white,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Timer, Answered count, Mark for Review toggle
-            Row(
+        backgroundColor: Colors.deepPurple,
+        title: Text('SSC MOCK TEST', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            color: Colors.deepPurple.shade700,
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Timer Badge
+                buildTimerBadge(),
                 Text(
-                  'Time Left: ${_formatTime(timeLeft)}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'Answered: ${selectedOptions.where((o) => o != null).length} / ${questions.length}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  children: [
-                    const Text('Mark for Review'),
-                    Switch(
-                      value: markForReview,
-                      onChanged: _toggleMarkForReview,
-                      activeColor: reviewColor,
-                    ),
-                  ],
+                  'Q${currentQ + 1}/${questions.length}',
+                  style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ],
             ),
-            const Divider(thickness: 2),
-            const SizedBox(height: 12),
-            Text(
-              questions[currentQuestionIndex],
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-                child: ListView.builder(
-                    itemCount: options[currentQuestionIndex].length,
-                    itemBuilder: (context, index) {
-                      final isSelected =
-                          selectedOptions[currentQuestionIndex] == index;
-                      return Card(
-                        elevation: 2,
-                        shadowColor: primaryColor.withOpacity(0.2),
-                        color:
-                            isSelected ? primaryColor.withOpacity(0.2) : null,
-                        child: RadioListTile<int>(
-                          value: index,
-                          groupValue: selectedOptions[currentQuestionIndex],
-                          activeColor: primaryColor,
-                          title: Text(
-                            options[currentQuestionIndex][index],
-                            style: TextStyle(
-                                fontSize: 18,
-                                color: isSelected ? primaryColor : Colors.black87),
-                          ),
-                          onChanged: (val) {
-                            if (val != null) _onOptionSelected(val);
-                          },
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // File & Question Details
+              Row(
+                children: [
+                  // File Icon & Name
+                  Image.asset('assets/images/file_icon.png', width: 40, height: 40),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          question['fileName'],
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                      );
-                    })),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 10,
-              children: List.generate(questions.length, (index) {
-                final bool answered = selectedOptions[index] != null;
-                Color circleColor;
-                if (index == currentQuestionIndex) {
-                  circleColor = primaryColor;
-                } else if (markForReview && index == currentQuestionIndex) {
-                  circleColor = reviewColor;
-                } else if (answered) {
-                  circleColor = answeredColor;
-                } else {
-                  circleColor = notVisitedColor;
-                }
-                return GestureDetector(
-                  onTap: () => _goToQuestion(index),
-                  child: CircleAvatar(
-                    radius: 16,
-                    backgroundColor: circleColor,
-                    child: Text(
-                      '${index + 1}',
-                      style: const TextStyle(color: Colors.white),
+                        Text('Click to view', style: TextStyle(fontSize: 14, color: Colors.blue)),
+                      ],
                     ),
                   ),
-                );
-              }),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-                  onPressed:
-                      currentQuestionIndex == 0 ? null : () => _goToQuestion(currentQuestionIndex - 1),
-                  child: const Text('Previous'),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
-                  onPressed: currentQuestionIndex == questions.length - 1
-                      ? null
-                      : () => _goToQuestion(currentQuestionIndex + 1),
-                  child: const Text('Next'),
-                ),
-              ],
-            )
-          ],
+                ],
+              ),
+              SizedBox(height: 20),
+              // Question Text
+              buildQuestionCard('Q${currentQ + 1}: ${question['question']}'),
+              SizedBox(height: 20),
+              // Options
+              ...question['options'].map<Widget>((opt) {
+                return buildOption(opt, answers[question['id']] ?? '', (val) {
+                  selectOption(val);
+                });
+              }).toList(),
+              SizedBox(height: 20),
+              // Mark for Review
+              Row(
+                children: [
+                  Checkbox(
+                    value: markedReview[question['id']] ?? false,
+                    onChanged: (_) => toggleMark(),
+                  ),
+                  Text('Mark for Review', style: TextStyle(fontSize: 16)),
+                ],
+              ),
+              SizedBox(height: 30),
+              // Navigation Buttons
+              buildNavigationButtons(),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget buildQuestionCard(String text) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 8,
+      child: Padding(
+        padding: EdgeInsets.all(20),
+        child: Text(text, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+      ),
+    );
+  }
+
+  Widget buildOption(String optionText, String groupValue, Function(String) onChanged) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.blueGrey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: RadioListTile<String>(
+        value: optionText,
+        groupValue: groupValue,
+        onChanged: (val) => onChanged(val!),
+        title: Text(optionText, style: TextStyle(fontSize: 16)),
+        activeColor: Colors.deepPurple,
+      ),
+    );
+  }
+
+  Widget buildNavigationButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ElevatedButton.icon(
+          onPressed: goPrevious,
+          icon: Icon(Icons.arrow_back),
+          label: Text('Previous'),
+          style: ElevatedButton.styleFrom(
+            primary: Colors.grey.shade700,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+        ),
+        ElevatedButton.icon(
+          onPressed: goNext,
+          icon: Icon(Icons.arrow_forward),
+          label: Text('Next'),
+          style: ElevatedButton.styleFrom(
+            primary: Colors.blueAccent,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+        ),
+        ElevatedButton.icon(
+          onPressed: showResult,
+          icon: Icon(Icons.check),
+          label: Text('Submit'),
+          style: ElevatedButton.styleFrom(
+            primary: Colors.green,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildTimerBadge() {
+    double progress = timeLeft.inSeconds / (15 * 60);
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        SizedBox(
+          width: 80,
+          height: 80,
+          child: CircularProgressIndicator(
+            value: progress,
+            strokeWidth: 8,
+            backgroundColor: Colors.grey.shade300,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.redAccent),
+          ),
+        ),
+        Text(
+          '${timeLeft.inMinutes.remainder(60).toString().padLeft(2, '0')}:${(timeLeft.inSeconds.remainder(60)).toString().padLeft(2, '0')}',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ],
     );
   }
 }
