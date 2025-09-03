@@ -1,25 +1,9 @@
 import 'package:flutter/material.dart';
-import 'dart:async'; 
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SSC MOCK TEST',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Arial', // Aap apne custom font bhi use kar sakte hain
-      ),
-      home: CBTRealisticScreen(),
-    );
-  }
-}
+import 'dart:async';
 
 class CBTRealisticScreen extends StatefulWidget {
+  const CBTRealisticScreen({Key? key}) : super(key: key);
+
   @override
   _CBTRealisticScreenState createState() => _CBTRealisticScreenState();
 }
@@ -30,14 +14,12 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
       'id': 1,
       'question': 'Which article of the Indian Constitution deals with Right to Equality?',
       'fileName': 'file1.pdf',
-      'image': 'assets/images/file_icon.png',
       'options': ['Article 19', 'Article 21', 'Article 14', 'Article 370']
     },
     {
       'id': 2,
       'question': 'Who is the current President of India?',
       'fileName': 'president_bio.pdf',
-      'image': 'assets/images/file_icon.png',
       'options': ['Ram Nath Kovind', 'Droupadi Murmu', 'APJ Abdul Kalam', 'Pranab Mukherjee']
     },
   ];
@@ -46,7 +28,7 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
   Map<int, String> answers = {};
   Map<int, bool> markedReview = {};
   late Timer timer;
-  Duration timeLeft = Duration(minutes: 15);
+  Duration timeLeft = const Duration(minutes: 15);
 
   @override
   void initState() {
@@ -55,14 +37,16 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
   }
 
   void startTimer() {
-    timer = Timer.periodic(Duration(seconds: 1), (_) {
+    timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (timeLeft.inSeconds == 0) {
         timer.cancel();
         showResult();
       } else {
-        setState(() {
-          timeLeft -= Duration(seconds: 1);
-        });
+        if (mounted) {
+          setState(() {
+            timeLeft -= const Duration(seconds: 1);
+          });
+        }
       }
     });
   }
@@ -71,14 +55,14 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Test Finished!'),
+        title: const Text('Test Finished!'),
         content: Text('Your answers: ${answers.toString()}'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
             },
-            child: Text('OK'),
+            child: const Text('OK'),
           ),
         ],
       ),
@@ -135,61 +119,58 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         backgroundColor: Colors.deepPurple,
-        title: Text('SSC MOCK TEST', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(60),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            color: Colors.deepPurple.shade700,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                buildTimerBadge(),
-                Text(
-                  'Q${currentQ + 1}/${questions.length}',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
-              ],
-            ),
+        title: const Text(
+          'SSC MOCK TEST',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
+        actions: [
+          // Timer Badge ko yahan display kiya gaya hai
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: buildTimerBadge(),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // File & Question Details
+              // File & Question Details (Image.asset hata diya gaya hai)
               Row(
                 children: [
-                  Image.asset('assets/images/file_icon.png', width: 40, height: 40),
-                  SizedBox(width: 10),
+                  const Icon(Icons.description, size: 40),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           question['fileName'],
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                        Text('Click to view', style: TextStyle(fontSize: 14, color: Colors.blue)),
+                        const Text('Click to view', style: TextStyle(fontSize: 14, color: Colors.blue)),
                       ],
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               // Question Card
               buildQuestionCard('Q${currentQ + 1}: ${question['question']}'),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               // Options
               ...question['options'].map<Widget>((opt) {
                 return buildOption(opt, answers[question['id']] ?? '', (val) {
                   selectOption(val);
                 });
               }).toList(),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               // Mark for Review
               Row(
                 children: [
@@ -197,10 +178,10 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
                     value: markedReview[question['id']] ?? false,
                     onChanged: (_) => toggleMark(),
                   ),
-                  Text('Mark for Review', style: TextStyle(fontSize: 16)),
+                  const Text('Mark for Review', style: TextStyle(fontSize: 16)),
                 ],
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               // Navigation Buttons
               buildNavigationButtons(),
             ],
@@ -215,15 +196,15 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 8,
       child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Text(text, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        padding: const EdgeInsets.all(20),
+        child: Text(text, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
       ),
     );
   }
 
   Widget buildOption(String optionText, String groupValue, Function(String) onChanged) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.blueGrey.shade300),
         borderRadius: BorderRadius.circular(8),
@@ -232,7 +213,7 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
         value: optionText,
         groupValue: groupValue,
         onChanged: (val) => onChanged(val!),
-        title: Text(optionText, style: TextStyle(fontSize: 16)),
+        title: Text(optionText, style: const TextStyle(fontSize: 16)),
         activeColor: Colors.deepPurple,
       ),
     );
@@ -244,29 +225,29 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
       children: [
         ElevatedButton.icon(
           onPressed: goPrevious,
-          icon: Icon(Icons.arrow_back),
-          label: Text('Previous'),
+          icon: const Icon(Icons.arrow_back),
+          label: const Text('Previous'),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.grey.shade700,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
         ),
         ElevatedButton.icon(
           onPressed: goNext,
-          icon: Icon(Icons.arrow_forward),
-          label: Text('Next'),
+          icon: const Icon(Icons.arrow_forward),
+          label: const Text('Next'),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blueAccent,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
         ),
         ElevatedButton.icon(
           onPressed: showResult,
-          icon: Icon(Icons.check),
-          label: Text('Submit'),
+          icon: const Icon(Icons.check),
+          label: const Text('Submit'),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
         ),
       ],
@@ -285,12 +266,12 @@ class _CBTRealisticScreenState extends State<CBTRealisticScreen> {
             value: progress,
             strokeWidth: 8,
             backgroundColor: Colors.grey.shade300,
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.redAccent),
+            valueColor: const AlwaysStoppedAnimation<Color>(Colors.redAccent),
           ),
         ),
         Text(
-          '${timeLeft.inMinutes.remainder(60).toString().padLeft(2, '0')}:${(timeLeft.inSeconds.remainder(60)).toString().padLeft(2, '0')}',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          getFormattedTime(),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ],
     );
