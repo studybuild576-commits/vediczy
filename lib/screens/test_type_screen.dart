@@ -2,33 +2,66 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vediczy/models/test_model.dart';
 import 'package:vediczy/services/dummy_data_service.dart';
-import 'package:vediczy/screens/test_list_screen.dart'; // Nayi screen import
+import 'package:vediczy/screens/test_list_screen.dart';
 
-class TestTypeScreen extends StatelessWidget {
+class TestTypeScreen extends StatefulWidget {
   final String examName;
   const TestTypeScreen({super.key, required this.examName});
 
   @override
-  Widget build(BuildContext context) {
-    // Hum dummy data se check karenge ki is exam ke tiers hain ya nahi.
-    // Asli app mein yeh jaankari exam ke document se aayegi.
-    bool hasTiers = DummyDataService()._dummyTests.any((test) => test.examName == examName && test.tier != null);
+  _TestTypeScreenState createState() => _TestTypeScreenState();
+}
 
+class _TestTypeScreenState extends State<TestTypeScreen> {
+  late Future<List<Test>> _testsForExamFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    // Saare tests fetch karke is exam ke liye filter karein
+    _testsForExamFuture = _getTestsForCurrentExam();
+  }
+
+  Future<List<Test>> _getTestsForCurrentExam() async {
+    final allTests = await DummyDataService().getAllTests();
+    return allTests.where((test) => test.examName == widget.examName).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(examName)),
-      body: hasTiers
-          ? _buildTierSelection(context)
-          : _buildTestTypeSelection(context, tier: null),
+      appBar: AppBar(title: Text(widget.examName)),
+      body: FutureBuilder<List<Test>>(
+        future: _testsForExamFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text("No tests found for this exam."));
+          }
+
+          final testsForThisExam = snapshot.data!;
+          // Ab hum fetched data par check lagayenge
+          bool hasTiers = testsForThisExam.any((test) => test.tier != null);
+
+          if (hasTiers) {
+            // Unique tiers nikalna
+            final tiers = testsForThisExam
+                .where((test) => test.tier != null)
+                .map((test) => test.tier!)
+                .toSet().toList();
+            tiers.sort(); // Tiers ko sort karein (1, 2, ...)
+            return _buildTierSelection(context, tiers);
+          } else {
+            return _buildTestTypeSelection(context, tier: null);
+          }
+        },
+      ),
     );
   }
 
-  Widget _buildTierSelection(BuildContext context) {
-    // Unique tiers nikalna
-    final tiers = DummyDataService()._dummyTests
-        .where((test) => test.examName == examName && test.tier != null)
-        .map((test) => test.tier!)
-        .toSet().toList();
-
+  Widget _buildTierSelection(BuildContext context, List<int> tiers) {
     return ListView.builder(
       padding: EdgeInsets.all(8),
       itemCount: tiers.length,
@@ -53,7 +86,7 @@ class TestTypeScreen extends StatelessWidget {
   Widget _buildTestTypeSelection(BuildContext context, {required int? tier}) {
     final testTypes = ['Mock Tests', 'PYQ Tests'];
     return Scaffold(
-      appBar: AppBar(title: Text("$examName ${tier != null ? '- Tier $tier' : ''}")),
+      appBar: AppBar(title: Text("${widget.examName} ${tier != null ? '- Tier $tier' : ''}")),
       body: ListView.builder(
         padding: EdgeInsets.all(8),
         itemCount: testTypes.length,
@@ -67,7 +100,7 @@ class TestTypeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(
                   builder: (context) => TestListScreen(
-                    examName: examName,
+                    examName: widget.examName,
                     tier: tier,
                     testType: type == 'Mock Tests' ? 'mock' : 'pyq',
                   ),
