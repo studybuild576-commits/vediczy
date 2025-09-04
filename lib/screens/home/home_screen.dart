@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:vediczy/models/test_model.dart';
+import 'package:vediczy/screens/category_tests_screen.dart';
 import 'package:vediczy/screens/profile/profile_screen.dart';
 import 'package:vediczy/screens/test/test_instructions_screen.dart';
-import 'package:vediczy/services/auth_service.dart';
 import 'package:vediczy/services/dummy_data_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,9 +13,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final AuthService _auth = AuthService();
   final User? user = FirebaseAuth.instance.currentUser;
-  
   late Future<List<Test>> _testsFuture;
 
   @override
@@ -26,46 +25,25 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Vediczy Dashboard"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.account_circle),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfileScreen()),
-              );
-            },
-            tooltip: 'Profile',
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+      backgroundColor: Colors.grey.shade100,
+      body: SafeArea(
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Welcome Header
-              Text(
-                'Welcome, ${user?.displayName ?? 'Aspirant'}!',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Let\'s start your preparation',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey.shade600),
+              _buildHeader(),
+              SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: _buildCategoryGrid(),
               ),
               SizedBox(height: 24),
-
-              // Category Cards
-              _buildCategoryGrid(),
-              SizedBox(height: 24),
-
-              // Featured Tests Section
-              Text(
-                'Featured Mock Tests',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text(
+                  'Featured Mock Tests',
+                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
               SizedBox(height: 12),
               _buildFeaturedTestsList(),
@@ -76,7 +54,51 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Naya Widget: Category Grid banane ke liye
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.indigo.shade600,
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(30),
+          bottomRight: Radius.circular(30),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Welcome, ${user?.displayName?.split(' ')[0] ?? 'Aspirant'}!',
+                style: GoogleFonts.poppins(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                'Let\'s start your preparation',
+                style: GoogleFonts.poppins(color: Colors.white70),
+              ),
+            ],
+          ),
+          GestureDetector(
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileScreen())),
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Text(
+                user?.displayName?.substring(0, 1) ?? user?.email?.substring(0, 1).toUpperCase() ?? 'U',
+                style: TextStyle(color: Colors.indigo.shade600, fontWeight: FontWeight.bold),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _buildCategoryGrid() {
     return GridView.count(
       crossAxisCount: 2,
@@ -85,58 +107,36 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
       children: [
-        _buildCategoryCard(
-          context,
-          title: 'Full Mock Tests',
-          icon: Icons.article,
-          color: Colors.orange.shade100,
-          iconColor: Colors.orange.shade800,
-        ),
-        _buildCategoryCard(
-          context,
-          title: 'Subject Quizzes',
-          icon: Icons.menu_book,
-          color: Colors.blue.shade100,
-          iconColor: Colors.blue.shade800,
-        ),
-        _buildCategoryCard(
-          context,
-          title: 'Previous Papers',
-          icon: Icons.history,
-          color: Colors.green.shade100,
-          iconColor: Colors.green.shade800,
-        ),
-        _buildCategoryCard(
-          context,
-          title: 'Current Affairs',
-          icon: Icons.public,
-          color: Colors.red.shade100,
-          iconColor: Colors.red.shade800,
-        ),
+        _buildCategoryCard(title: 'Full Mock Tests', icon: Icons.article, color: Colors.orange),
+        _buildCategoryCard(title: 'Subject Quizzes', icon: Icons.menu_book, color: Colors.blue),
+        _buildCategoryCard(title: 'Previous Papers', icon: Icons.history, color: Colors.green),
+        _buildCategoryCard(title: 'Current Affairs', icon: Icons.public, color: Colors.red),
       ],
     );
   }
 
-  // Naya Widget: Category Card design karne ke liye
-  Widget _buildCategoryCard(BuildContext context, {required String title, required IconData icon, required Color color, required Color iconColor}) {
-    return Card(
-      elevation: 2,
-      color: color,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: () {
-          // Abhi ke liye sabhi cards ek hi jagah jayenge
-          // Baad mein hum alag-alag screens ke liye logic likhenge
-        },
+  Widget _buildCategoryCard({required String title, required IconData icon, required Color color}) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) => CategoryTestsScreen(categoryTitle: title),
+        ));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: color.withOpacity(0.3)),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 40, color: iconColor),
+            Icon(icon, size: 40, color: color),
             SizedBox(height: 10),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(fontWeight: FontWeight.bold, color: iconColor),
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: color),
             ),
           ],
         ),
@@ -144,7 +144,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Naya Widget: Featured Test List banane ke liye
   Widget _buildFeaturedTestsList() {
     return FutureBuilder<List<Test>>(
       future: _testsFuture,
@@ -152,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
-        if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(child: Text("No tests available."));
         }
         final tests = snapshot.data!;
@@ -162,21 +161,34 @@ class _HomeScreenState extends State<HomeScreen> {
           itemCount: tests.length,
           itemBuilder: (context, index) {
             final test = tests[index];
-            return Card(
-              margin: EdgeInsets.symmetric(vertical: 6.0),
+            return Container(
+              margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 5,
+                  ),
+                ],
+              ),
               child: ListTile(
-                leading: Icon(Icons.article_outlined, color: Theme.of(context).primaryColor),
-                title: Text(test.title, style: TextStyle(fontWeight: FontWeight.bold)),
+                leading: Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.indigo.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.article_outlined, color: Colors.indigo),
+                ),
+                title: Text(test.title, style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
                 subtitle: Text("${test.examName} | ${test.durationInMinutes} Mins"),
                 trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TestInstructionsScreen(test: test),
-                    ),
-                  );
-                },
+                onTap: () => Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => TestInstructionsScreen(test: test),
+                )),
               ),
             );
           },
