@@ -1,17 +1,45 @@
-import 'package:vediczy/models/question_model.dart'; // Is line ko upar add karein
+import 'package:vediczy/models/question_model.dart';
 import 'package:vediczy/models/test_model.dart';
 
 class DummyDataService {
 
-  // ... aapka purana getAllTests() function yahan hai ...
-  final List<Test> _dummyTests = [ /* ... purana data ... */ ];
-  Future<List<Test>> getAllTests() async { /* ... purana code ... */ }
+  // Mock Tests ki ek nakli list
+  final List<Test> _dummyTests = [
+    Test(
+      id: 'ssc-cgl-mock-1',
+      title: 'SSC CGL Tier-1 Full Mock Test',
+      description: 'Based on the latest pattern with all new questions.',
+      durationInMinutes: 60,
+      totalMarks: 200,
+      examName: 'SSC CGL Tier-1',
+    ),
+    Test(
+      id: 'rrb-ntpc-mock-1',
+      title: 'RRB NTPC CBT-1 Mock Test',
+      description: 'High-level questions for comprehensive practice.',
+      durationInMinutes: 90,
+      totalMarks: 100,
+      examName: 'RRB NTPC',
+    ),
+    Test(
+      id: 'ssc-chsl-mock-1',
+      title: 'SSC CHSL Previous Year Paper 2024',
+      description: 'Solve the actual paper from the last exam.',
+      durationInMinutes: 60,
+      totalMarks: 200,
+      examName: 'SSC CHSL',
+    ),
+  ];
 
-  // YEH NAYA FUNCTION ADD KAREIN
+  // Function jo saare dummy tests return karega
+  Future<List<Test>> getAllTests() async {
+    await Future.delayed(Duration(seconds: 1));
+    return _dummyTests;
+  }
+
+  // Function jo ek test ke saare questions return karega
   Future<List<Question>> getQuestionsForTest(String testId) async {
     await Future.delayed(Duration(seconds: 1));
-    // Hum har test ke liye same 5 dummy questions bhej rahe hain
-    // Asli app mein, yeh testId ke hisab se Firestore se aayenge
     return [
       Question(
         id: 'q1', testId: testId, subject: 'General Awareness',
