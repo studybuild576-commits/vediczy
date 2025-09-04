@@ -48,9 +48,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Add your assets here
-  assets:
-    - assets/
+  # Add your assets here (YEH BADLAAV KIYA GAYA HAI)
+  # assets:
+  #   - assets/
   
   # Add your fonts here
   # fonts:
