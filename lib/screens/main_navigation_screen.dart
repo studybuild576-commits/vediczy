@@ -14,7 +14,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0; // Kaunsa icon select hai
 
   // Hamari 3 main screens ki list
-  static const List<Widget> _pages = <Widget>[
+  static final List<Widget> _pages = <Widget>[
     HomeScreen(),
     AllTestsScreen(),
     RevisionScreen(),
