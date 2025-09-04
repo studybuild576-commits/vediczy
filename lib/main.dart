@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.indigo,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: Wrapper(), // Yeh Wrapper ko call karega
+        home: SplashScreen(), // Yeh Wrapper ko call karega
       ),
     );
   }
