@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vediczy/screens/auth/login_screen.dart';
+import 'package:vediczy/screens/splash_screen.dart';
 import 'package:vediczy/screens/main_navigation_screen.dart'; // Naya import
 import 'package:vediczy/services/auth_service.dart';
 
