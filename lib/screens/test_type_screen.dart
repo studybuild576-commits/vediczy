@@ -18,13 +18,14 @@ class _TestTypeScreenState extends State<TestTypeScreen> {
   @override
   void initState() {
     super.initState();
-    // Saare tests fetch karke is exam ke liye filter karein
     _testsForExamFuture = _getTestsForCurrentExam();
   }
 
+  // YAHAN BADLAAV KIYA GAYA HAI
   Future<List<Test>> _getTestsForCurrentExam() async {
     final allTests = await DummyDataService().getAllTests();
-    return allTests.where((test) => test.examName == widget.examName).toList();
+    // Humne (test) ki jagah (Test test) likha hai taaki type saaf ho jaye
+    return allTests.where((Test test) => test.examName == widget.examName).toList();
   }
 
   @override
@@ -42,16 +43,14 @@ class _TestTypeScreenState extends State<TestTypeScreen> {
           }
 
           final testsForThisExam = snapshot.data!;
-          // Ab hum fetched data par check lagayenge
           bool hasTiers = testsForThisExam.any((test) => test.tier != null);
 
           if (hasTiers) {
-            // Unique tiers nikalna
             final tiers = testsForThisExam
                 .where((test) => test.tier != null)
                 .map((test) => test.tier!)
                 .toSet().toList();
-            tiers.sort(); // Tiers ko sort karein (1, 2, ...)
+            tiers.sort();
             return _buildTierSelection(context, tiers);
           } else {
             return _buildTestTypeSelection(context, tier: null);
