@@ -16,7 +16,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.example.vediczy"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973" // YEH BADLAAV KIYA GAYA HAI
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -29,9 +29,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.vediczy"
-        minSdk = flutter.minSdkVersion
+        minSdk = 23 // YEH BADLAAV KIYA GAYA HAI
         targetSdk = flutter.targetSdkVersion
-        // यहाँ बदलाव किया गया है
         versionCode = flutter.versionCode()
         versionName = flutter.versionName()
     }
@@ -47,13 +46,10 @@ android {
 
     buildTypes {
         getByName("release") {
-            // yahi fix hai
             isMinifyEnabled = false
             isShrinkResources = false
             signingConfig = signingConfigs.getByName("release")
         }
-        // debug build type ko yahan se hata sakte hain agar aapke paas debug keystore nahi hai
-        // getByName("debug") { ... }
     }
 }
 
