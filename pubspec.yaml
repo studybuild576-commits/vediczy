@@ -31,7 +31,7 @@ dependencies:
   # Google Mobile Ads SDK
   google_mobile_ads: ^5.1.0
   
-  # Stylish fonts for UI (YEH ADD KIYA HAI)
+  # Stylish fonts for UI
   google_fonts: ^6.2.1
   
   # State Management
@@ -41,7 +41,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+    
+  # Version ko 5.0.0 se 4.0.0 kiya gaya hai
+  flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true
