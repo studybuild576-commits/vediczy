@@ -31,8 +31,9 @@ android {
         applicationId = "com.example.vediczy"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        // यहाँ बदलाव किया गया है
+        versionCode = flutter.versionCode()
+        versionName = flutter.versionName()
     }
 
     signingConfigs {
@@ -51,11 +52,8 @@ android {
             isShrinkResources = false
             signingConfig = signingConfigs.getByName("release")
         }
-        getByName("debug") {
-            isMinifyEnabled = false
-            isShrinkResources = false
-            signingConfig = signingConfigs.getByName("debug")
-        }
+        // debug build type ko yahan se hata sakte hain agar aapke paas debug keystore nahi hai
+        // getByName("debug") { ... }
     }
 }
 
