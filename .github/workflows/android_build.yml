@@ -10,6 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # Git permission error ko theek karne ke liye
+    permissions:
+      contents: read
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -45,7 +49,8 @@ jobs:
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.35.2'   # <-- Latest stable Flutter with Dart 3.9+
+        flutter-version: '3.22.2'  # Corrected to a recent stable version
+        cache: true
 
     - name: Install Flutter dependencies
       run: flutter pub get
