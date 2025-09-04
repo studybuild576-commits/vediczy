@@ -1,4 +1,4 @@
-import 'package.flutter/material.dart';
+import 'package:flutter/material.dart'; // YEH LINE ADD KI GAYI HAI
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:vediczy/services/auth_service.dart';
 
@@ -70,9 +70,7 @@ class ProfileScreen extends StatelessWidget {
               textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             onPressed: () async {
-              // Logout karne par user ko wapas login screen par bhej denge
               await authService.signOut();
-              // Profile screen se bahar nikal kar home par jao (jo login screen ban jayegi)
               Navigator.of(context).popUntil((route) => route.isFirst);
             },
           ),
