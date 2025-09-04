@@ -1,81 +1,44 @@
-import 'package:vediczy/models/question_model.dart';
-import 'package:vediczy/models/test_model.dart';
+import 'package.vediczy/models/question_model.dart';
+import 'package.vediczy/models/test_model.dart';
 
 class DummyDataService {
 
-  // Mock Tests ki ek nakli list
   final List<Test> _dummyTests = [
-    Test(
-      id: 'ssc-cgl-mock-1',
-      title: 'SSC CGL Tier-1 Full Mock Test',
-      description: 'Based on the latest pattern with all new questions.',
-      durationInMinutes: 60,
-      totalMarks: 200,
-      examName: 'SSC CGL Tier-1',
-    ),
-    Test(
-      id: 'rrb-ntpc-mock-1',
-      title: 'RRB NTPC CBT-1 Mock Test',
-      description: 'High-level questions for comprehensive practice.',
-      durationInMinutes: 90,
-      totalMarks: 100,
-      examName: 'RRB NTPC',
-    ),
-    Test(
-      id: 'ssc-chsl-mock-1',
-      title: 'SSC CHSL Previous Year Paper 2024',
-      description: 'Solve the actual paper from the last exam.',
-      durationInMinutes: 60,
-      totalMarks: 200,
-      examName: 'SSC CHSL',
-    ),
+    // --- SSC Exams ---
+    Test(id: 'ssc-cgl-t1-mock-1', title: 'SSC CGL Tier-1 Full Mock #1', category: 'ssc', examName: 'SSC CGL', tier: 1, testType: 'mock', testFormat: 'full', durationInMinutes: 60, totalMarks: 200, description: 'Latest pattern CGL Tier-1 mock.'),
+    Test(id: 'ssc-cgl-t1-pyq-1', title: 'SSC CGL Tier-1 PYQ (2024)', category: 'ssc', examName: 'SSC CGL', tier: 1, testType: 'pyq', testFormat: 'full', durationInMinutes: 60, totalMarks: 200, description: 'Previous year paper for CGL Tier-1.'),
+    Test(id: 'ssc-cgl-t2-mock-1', title: 'SSC CGL Tier-2 Full Mock #1', category: 'ssc', examName: 'SSC CGL', tier: 2, testType: 'mock', testFormat: 'full', durationInMinutes: 120, totalMarks: 390, description: 'Latest pattern CGL Tier-2 mock.'),
+    Test(id: 'ssc-chsl-t1-mock-1', title: 'SSC CHSL Tier-1 Mock #1', category: 'ssc', examName: 'SSC CHSL', tier: 1, testType: 'mock', testFormat: 'full', durationInMinutes: 60, totalMarks: 200, description: 'Latest pattern CHSL mock.'),
+    Test(id: 'ssc-mts-mock-1', title: 'SSC MTS Full Mock Test #1', category: 'ssc', examName: 'SSC MTS', tier: null, testType: 'mock', testFormat: 'full', durationInMinutes: 90, totalMarks: 150, description: 'Practice test for SSC MTS.'),
+    Test(id: 'ssc-gd-mock-1', title: 'SSC GD Constable Mock #1', category: 'ssc', examName: 'SSC GD Constable', tier: null, testType: 'mock', testFormat: 'full', durationInMinutes: 60, totalMarks: 160, description: 'Practice test for GD Constable.'),
+    // --- Railway Exams ---
+    Test(id: 'rrb-ntpc-cbt1-mock-1', title: 'RRB NTPC CBT-1 Full Mock', category: 'railway', examName: 'RRB NTPC', tier: 1, testType: 'mock', testFormat: 'full', durationInMinutes: 90, totalMarks: 100, description: 'Practice for NTPC CBT-1.'),
+    Test(id: 'rrb-ntpc-cbt2-mock-1', title: 'RRB NTPC CBT-2 Full Mock', category: 'railway', examName: 'RRB NTPC', tier: 2, testType: 'mock', testFormat: 'full', durationInMinutes: 90, totalMarks: 120, description: 'Practice for NTPC CBT-2.'),
+    Test(id: 'rrb-groupd-mock-1', title: 'RRB Group D Mock Test #1', category: 'railway', examName: 'RRB Group D', tier: null, testType: 'mock', testFormat: 'full', durationInMinutes: 90, totalMarks: 100, description: 'Practice test for RRB Group D.'),
+    Test(id: 'rrb-alp-cbt1-mock-1', title: 'RRB ALP CBT-1 Mock Test', category: 'railway', examName: 'RRB ALP', tier: 1, testType: 'mock', testFormat: 'full', durationInMinutes: 60, totalMarks: 75, description: 'Practice for ALP CBT-1.'),
   ];
 
-  // Function jo saare dummy tests return karega
   Future<List<Test>> getAllTests() async {
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(milliseconds: 500));
     return _dummyTests;
   }
 
-  // Function jo ek test ke saare questions return karega
+  Future<List<String>> getUniqueExamNamesForCategory(String categoryId) async {
+    final allTests = await getAllTests();
+    final filteredTests = allTests.where((test) => test.category == categoryId).toList();
+    final uniqueExamNames = filteredTests.map((test) => test.examName).toSet().toList();
+    return uniqueExamNames;
+  }
+
+  Future<List<Test>> getTestsByFilter({required String examName, int? tier, required String testType}) async {
+    final allTests = await getAllTests();
+    return allTests.where((test) {
+      return test.examName == examName && test.tier == tier && test.testType == testType;
+    }).toList();
+  }
+
+  // getQuestionsForTest() function waise hi rahega
   Future<List<Question>> getQuestionsForTest(String testId) async {
-    await Future.delayed(Duration(seconds: 1));
-    return [
-      Question(
-        id: 'q1', testId: testId, subject: 'General Awareness',
-        questionText: 'What is the capital of India?',
-        options: ['Mumbai', 'Kolkata', 'New Delhi', 'Chennai'],
-        correctOptionIndex: 2,
-        solutionText: 'New Delhi is the capital of India.'
-      ),
-      Question(
-        id: 'q2', testId: testId, subject: 'Maths',
-        questionText: 'What is 2 + 2 * 2?',
-        options: ['8', '6', '4', '10'],
-        correctOptionIndex: 1,
-        solutionText: 'According to BODMAS rule, 2 * 2 = 4, then 4 + 2 = 6.'
-      ),
-      Question(
-        id: 'q3', testId: testId, subject: 'Reasoning',
-        questionText: 'Which number comes next in the series: 2, 4, 6, 8, __?',
-        options: ['9', '10', '12', '5'],
-        correctOptionIndex: 1,
-        solutionText: 'This is a simple series of even numbers.'
-      ),
-      Question(
-        id: 'q4', testId: testId, subject: 'English',
-        questionText: 'What is the synonym of "Happy"?',
-        options: ['Sad', 'Joyful', 'Angry', 'Tired'],
-        correctOptionIndex: 1,
-        solutionText: 'Joyful is a word with a similar meaning to Happy.'
-      ),
-      Question(
-        id: 'q5', testId: testId, subject: 'General Awareness',
-        questionText: 'Which planet is known as the Red Planet?',
-        options: ['Earth', 'Mars', 'Jupiter', 'Saturn'],
-        correctOptionIndex: 1,
-        solutionText: 'Mars is known as the Red Planet due to its reddish appearance.'
-      ),
-    ];
+    // ...
   }
 }
