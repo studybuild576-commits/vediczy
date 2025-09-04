@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vediczy/screens/auth/login_screen.dart';
-import 'package:vediczy/screens/home/home_screen.dart';
+import 'package:vediczy/screens/main_navigation_screen.dart'; // Naya import
 import 'package:vediczy/services/auth_service.dart';
 
 void main() async {
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.indigo,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: Wrapper(),
+        home: Wrapper(), // Yeh Wrapper ko call karega
       ),
     );
   }
@@ -43,9 +43,10 @@ class Wrapper extends StatelessWidget {
     if (user == null) {
       return LoginScreen();
     }
-    // Agar user logged in hai, to HomeScreen dikhayein
+    // Agar user logged in hai, to MainNavigationScreen dikhayein
     else {
-      return HomeScreen();
+      // YEH BADLAAV KIYA GAYA HAI
+      return MainNavigationScreen();
     }
   }
 }
