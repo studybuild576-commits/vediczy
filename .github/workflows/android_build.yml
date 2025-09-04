@@ -1,0 +1,52 @@
+name: Android Build and SHA1 Key
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    - name: Decode permanent keystore
+      run: |
+        echo "${{ secrets.CM_KEYSTORE }}" | base64 --decode > android/app/upload-keystore.jks
+    - name: Create key.properties file
+      run: |
+        echo "storeFile=upload-keystore.jks" > android/key.properties
+        echo "storePassword=${{ secrets.CM_KEYSTORE_PASSWORD }}" >> android/key.properties
+        echo "keyAlias=${{ secrets.CM_KEY_ALIAS }}" >> android/key.properties
+        echo "keyPassword=${{ secrets.CM_KEY_PASSWORD }}" >> android/key.properties
+    - name: Generate SHA1 from permanent keystore
+      run: |
+        echo "🔐 Permanent SHA1 (from keystore):"
+        keytool -list -v \
+          -keystore android/app/upload-keystore.jks \
+          -alias "${{ secrets.CM_KEY_ALIAS }}" \
+          -storepass "${{ secrets.CM_KEYSTORE_PASSWORD }}" \
+          -keypass "${{ secrets.CM_KEY_PASSWORD }}" \
+          | grep 'SHA1:'
+    - name: Show expected SHA1 (from secret)
+      run: |
+        echo "✅ Expected SHA1 (from GitHub Secret):"
+        echo "${{ secrets.PERMANENT_SHA1 }}"
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.35.2'   # <-- Latest stable Flutter with Dart 3.9+
+    - name: Install Flutter dependencies
+      run: flutter pub get
+    - name: Build signed release APK
+      run: flutter build apk --release
+    - name: Upload release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
