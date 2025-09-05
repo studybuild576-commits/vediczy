@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vediczy/models/test_model.dart';
 import 'package:vediczy/screens/test/test_instructions_screen.dart';
-import 'package:vediczy/services/dummy_data_service.dart';
+import 'package:vediczy/services/firestore_service.dart'; // नया इम्पोर्ट
 
 class TestListScreen extends StatefulWidget {
   final String examName;
@@ -21,7 +21,8 @@ class _TestListScreenState extends State<TestListScreen> {
   @override
   void initState() {
     super.initState();
-    _testsFuture = DummyDataService().getTestsByFilter(
+    // YAHAN BADLAAV KIYA GAYA HAI
+    _testsFuture = FirestoreService().getTestsByFilter(
       examName: widget.examName,
       tier: widget.tier,
       testType: widget.testType,
