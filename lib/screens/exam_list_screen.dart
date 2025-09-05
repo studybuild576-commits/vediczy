@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:vediczy/services/firestore_service.dart'; // नया इम्पोर्ट
-import 'package:vediczy/screens/test_type_screen.dart';
+import 'package:vediczy/services/firestore_service.dart'; // यह इम्पोर्ट ज़रूरी है
+import 'package:vediczy/screens/test_type_screen.dart'; // यह इम्पोर्ट भी ज़रूरी है
 
 class ExamListScreen extends StatefulWidget {
   final String categoryId;
@@ -19,7 +19,6 @@ class _ExamListScreenState extends State<ExamListScreen> {
   @override
   void initState() {
     super.initState();
-    // YAHAN BADLAAV KIYA GAYA HAI
     _examsFuture = FirestoreService().getUniqueExamNamesForCategory(widget.categoryId);
   }
 
