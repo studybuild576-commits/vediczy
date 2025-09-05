@@ -4,9 +4,8 @@ import 'package:vediczy/models/question_model.dart';
 import 'package:vediczy/models/result_model.dart';
 import 'package:vediczy/models/test_model.dart';
 import 'package:vediczy/screens/test/result_screen.dart';
-import 'package:vediczy/services/dummy_data_service.dart';
+import 'package:vediczy/services/firestore_service.dart'; // नया इम्पोर्ट
 
-// Question ka status track karne ke liye
 enum QuestionStatus { notVisited, notAnswered, answered, markedForReview, answeredAndMarked }
 
 class TestScreen extends StatefulWidget {
@@ -19,7 +18,7 @@ class TestScreen extends StatefulWidget {
 
 class _TestScreenState extends State<TestScreen> {
   late Future<List<Question>> _questionsFuture;
-  List<Question> _questionsList = []; // Questions ko yahan store karenge
+  List<Question> _questionsList = [];
   late List<QuestionStatus> _questionStatuses;
   late List<int?> _selectedOptions;
   late PageController _pageController;
@@ -31,18 +30,17 @@ class _TestScreenState extends State<TestScreen> {
   @override
   void initState() {
     super.initState();
-    _questionsFuture = DummyDataService().getQuestionsForTest(widget.test.id);
+    // YAHAN BADLAAV KIYA GAYA HAI
+    _questionsFuture = FirestoreService().getQuestionsForTest(widget.test.id);
     _pageController = PageController();
     _remainingSeconds = widget.test.durationInMinutes * 60;
     _startTimer();
 
-    // Initialize statuses and selections
     _questionsFuture.then((questions) {
       setState(() {
-        _questionsList = questions; // Questions ko state variable mein save karein
+        _questionsList = questions;
         _questionStatuses = List.generate(questions.length, (index) => QuestionStatus.notVisited);
         _selectedOptions = List.generate(questions.length, (index) => null);
-        // Mark the first question as not answered (visited)
         if (_questionStatuses.isNotEmpty) {
           _questionStatuses[0] = QuestionStatus.notAnswered;
         }
@@ -53,12 +51,9 @@ class _TestScreenState extends State<TestScreen> {
   void _startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (_remainingSeconds > 0) {
-        setState(() {
-          _remainingSeconds--;
-        });
+        setState(() { _remainingSeconds--; });
       } else {
         _timer.cancel();
-        // Auto-submit logic here
         _calculateAndNavigateToResult();
       }
     });
@@ -88,23 +83,19 @@ class _TestScreenState extends State<TestScreen> {
   }
 
   void _saveAndNext() {
-      // Logic to save the answer first
       if(_selectedOptions[_currentIndex] != null) {
           _questionStatuses[_currentIndex] = QuestionStatus.answered;
       } else {
           _questionStatuses[_currentIndex] = QuestionStatus.notAnswered;
       }
 
-      // Move to next question
-      if (_currentIndex < _questionStatuses.length - 1) {
+      if (_currentIndex < _questionsList.length - 1) {
           _pageController.nextPage(duration: Duration(milliseconds: 300), curve: Curves.easeIn);
       } else {
-          // Last question - show a submit dialog
           _submitTest();
       }
   }
   
-  // NAYA FUNCTION: Test submit karne ke liye
   void _submitTest() {
     showDialog(
       context: context,
@@ -115,15 +106,13 @@ class _TestScreenState extends State<TestScreen> {
         actions: <Widget>[
           TextButton(
             child: Text('Cancel'),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
+            onPressed: () => Navigator.of(ctx).pop(),
           ),
           TextButton(
             child: Text('Submit'),
             onPressed: () {
-              Navigator.of(ctx).pop(); 
-              _calculateAndNavigateToResult(); 
+              Navigator.of(ctx).pop();
+              _calculateAndNavigateToResult();
             },
           ),
         ],
@@ -131,15 +120,13 @@ class _TestScreenState extends State<TestScreen> {
     );
   }
 
-  // NAYA FUNCTION: Result calculate karke navigate karne ke liye
   void _calculateAndNavigateToResult() {
     _timer.cancel();
-
     int total = _questionsList.length;
     int attempted = 0;
     int correct = 0;
     int incorrect = 0;
-    double score = 0.0; 
+    double score = 0.0;
 
     for (int i = 0; i < total; i++) {
       if (_selectedOptions[i] != null) {
@@ -183,7 +170,6 @@ class _TestScreenState extends State<TestScreen> {
               ),
             ),
           ),
-          // NAYA SUBMIT BUTTON
           TextButton(
             onPressed: _submitTest,
             child: Text('SUBMIT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -200,11 +186,9 @@ class _TestScreenState extends State<TestScreen> {
           if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text("Could not load questions."));
           }
-
           final questions = snapshot.data!;
           return Column(
             children: [
-              // Question Area
               Expanded(
                 child: PageView.builder(
                   controller: _pageController,
@@ -214,7 +198,7 @@ class _TestScreenState extends State<TestScreen> {
                     final question = questions[index];
                     return Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: SingleChildScrollView( // Added for smaller screens
+                      child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -228,16 +212,13 @@ class _TestScreenState extends State<TestScreen> {
                               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 20),
-                            // Options
                             ...List.generate(question.options.length, (optionIndex) {
                               return RadioListTile<int>(
                                 title: Text(question.options[optionIndex]),
                                 value: optionIndex,
                                 groupValue: _selectedOptions[index],
                                 onChanged: (value) {
-                                  setState(() {
-                                    _selectedOptions[index] = value;
-                                  });
+                                  setState(() { _selectedOptions[index] = value; });
                                 },
                               );
                             })
@@ -248,8 +229,6 @@ class _TestScreenState extends State<TestScreen> {
                   },
                 ),
               ),
-
-              // Action Buttons
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -257,9 +236,7 @@ class _TestScreenState extends State<TestScreen> {
                   children: [
                     ElevatedButton(onPressed: (){}, child: Text("Mark for Review")),
                     ElevatedButton(onPressed: (){
-                        setState(() {
-                            _selectedOptions[_currentIndex] = null;
-                        });
+                        setState(() { _selectedOptions[_currentIndex] = null; });
                     }, child: Text("Clear Response")),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
@@ -276,7 +253,6 @@ class _TestScreenState extends State<TestScreen> {
     );
   }
 
-  // Question Palette Drawer
   Widget _buildQuestionPalette() {
     return Drawer(
       child: SafeArea(
@@ -292,7 +268,7 @@ class _TestScreenState extends State<TestScreen> {
               return ElevatedButton(
                 onPressed: () {
                     _pageController.jumpToPage(index);
-                    Navigator.pop(context); // Close the drawer
+                    Navigator.pop(context);
                 },
                 child: Text('${index + 1}'),
                 style: ElevatedButton.styleFrom(
@@ -309,20 +285,13 @@ class _TestScreenState extends State<TestScreen> {
   }
 
   Color _getQuestionColor(int index) {
-    // Check if question statuses is initialized
     if (index >= _questionStatuses.length) return Colors.grey;
-
     switch (_questionStatuses[index]) {
-        case QuestionStatus.answered:
-            return Colors.green;
-        case QuestionStatus.notAnswered:
-            return Colors.red;
-        case QuestionStatus.markedForReview:
-            return Colors.purple;
-        case QuestionStatus.answeredAndMarked:
-            return Colors.purpleAccent;
-        case QuestionStatus.notVisited:
-            return Colors.grey;
+        case QuestionStatus.answered: return Colors.green;
+        case QuestionStatus.notAnswered: return Colors.red;
+        case QuestionStatus.markedForReview: return Colors.purple;
+        case QuestionStatus.answeredAndMarked: return Colors.purpleAccent;
+        case QuestionStatus.notVisited: return Colors.grey;
     }
   }
 }
