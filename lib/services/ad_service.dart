@@ -1,5 +1,5 @@
-import 'package.flutter/material.dart';
-import 'package.google_mobile_ads/google_mobile_ads.dart'; // YEH IMPORT ZAROORI HAI
+import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdService {
   // --- Ad Unit IDs (Google Test IDs) ---
@@ -27,9 +27,9 @@ class AdService {
       request: const AdRequest(),
       size: AdSize.banner,
       listener: BannerAdListener(
-        onAdLoaded: (ad) => print('✅ Banner Ad loaded.'),
+        onAdLoaded: (ad) => debugPrint('✅ Banner Ad loaded.'),
         onAdFailedToLoad: (ad, err) {
-          print('❌ Banner Ad failed to load: $err');
+          debugPrint('❌ Banner Ad failed to load: $err');
           ad.dispose();
         },
       ),
@@ -44,10 +44,10 @@ class AdService {
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
           _interstitialAd = ad;
-          print('✅ Interstitial Ad loaded.');
+          debugPrint('✅ Interstitial Ad loaded.');
         },
         onAdFailedToLoad: (LoadAdError error) {
-          print('❌ InterstitialAd failed to load: $error');
+          debugPrint('❌ InterstitialAd failed to load: $error');
           _interstitialAd = null;
         },
       ),
@@ -56,7 +56,7 @@ class AdService {
 
   void showInterstitialAd({required VoidCallback onAdDismissed}) {
     if (_interstitialAd == null) {
-      print('⚠️ Warning: Interstitial ad is not loaded yet.');
+      debugPrint('⚠️ Warning: Interstitial ad is not loaded yet.');
       onAdDismissed();
       return;
     }
@@ -82,10 +82,10 @@ class AdService {
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
           _rewardedAd = ad;
-          print('✅ Rewarded Ad loaded.');
+          debugPrint('✅ Rewarded Ad loaded.');
         },
         onAdFailedToLoad: (LoadAdError error) {
-          print('❌ Rewarded Ad failed to load: $error');
+          debugPrint('❌ Rewarded Ad failed to load: $error');
           _rewardedAd = null;
         },
       ),
@@ -94,7 +94,7 @@ class AdService {
 
   void showRewardedAd({required Function(RewardItem) onUserEarnedReward}) {
     if (_rewardedAd == null) {
-      print('⚠️ Warning: Rewarded ad is not loaded yet.');
+      debugPrint('⚠️ Warning: Rewarded ad is not loaded yet.');
       return;
     }
     _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
@@ -107,9 +107,11 @@ class AdService {
         loadRewardedAd();
       },
     );
-    _rewardedAd!.show(onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
-      onUserEarnedReward(reward);
-    });
+    _rewardedAd!.show(
+      onUserEarnedReward: (ad, reward) {
+        onUserEarnedReward(reward);
+      },
+    );
     _rewardedAd = null;
   }
 }
