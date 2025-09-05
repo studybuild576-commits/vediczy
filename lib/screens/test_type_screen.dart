@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:vediczy/models/test_model.dart'; // यह इम्पोर्ट ज़रूरी है
+import 'package:vediczy/models/test_model.dart';
 import 'package:vediczy/services/firestore_service.dart';
 import 'package:vediczy/screens/test_list_screen.dart';
 
@@ -52,5 +52,57 @@ class _TestTypeScreenState extends State<TestTypeScreen> {
       ),
     );
   }
-  // ... (बाकी के _buildTierSelection और _buildTestTypeSelection विजेट्स यहाँ रहेंगे)
+
+  // YEH HELPER FUNCTIONS MISSING THE
+  Widget _buildTierSelection(BuildContext context, List<int> tiers) {
+    return ListView.builder(
+      padding: EdgeInsets.all(8),
+      itemCount: tiers.length,
+      itemBuilder: (context, index){
+        final tier = tiers[index];
+         return Card(
+          margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: ListTile(
+            title: Text("Tier $tier", style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            trailing: Icon(Icons.arrow_forward_ios_rounded),
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(
+                builder: (context) => _buildTestTypeSelection(context, tier: tier)
+              ));
+            },
+          ),
+        );
+      }
+    );
+  }
+
+  Widget _buildTestTypeSelection(BuildContext context, {required int? tier}) {
+    final testTypes = ['Mock Tests', 'PYQ Tests'];
+    return Scaffold(
+      appBar: AppBar(title: Text("${widget.examName} ${tier != null ? '- Tier $tier' : ''}")),
+      body: ListView.builder(
+        padding: EdgeInsets.all(8),
+        itemCount: testTypes.length,
+        itemBuilder: (context, index){
+          final type = testTypes[index];
+           return Card(
+            margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: ListTile(
+              title: Text(type, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+              trailing: Icon(Icons.arrow_forward_ios_rounded),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => TestListScreen(
+                    examName: widget.examName,
+                    tier: tier,
+                    testType: type == 'Mock Tests' ? 'mock' : 'pyq',
+                  ),
+                ));
+              },
+            ),
+          );
+        }
+      ),
+    );
+  }
 }
