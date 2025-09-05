@@ -1,5 +1,5 @@
 import 'package.flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart'; // YEH IMPORT ZAROORI HAI
+import 'package.google_mobile_ads/google_mobile_ads.dart';
 
 class AdService {
   // --- Ad Unit IDs (Google Test IDs) ---
@@ -57,7 +57,7 @@ class AdService {
   void showInterstitialAd({required VoidCallback onAdDismissed}) {
     if (_interstitialAd == null) {
       print('⚠️ Warning: Interstitial ad is not loaded yet.');
-      onAdDismissed(); // विज्ञापन के बिना आगे बढ़ें
+      onAdDismissed();
       return;
     }
     _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
@@ -100,7 +100,7 @@ class AdService {
     _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
       onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
-        loadRewardedAd(); // अगला विज्ञापन लोड करें
+        loadRewardedAd();
       },
       onAdFailedToShowFullScreenContent: (ad, error) {
         ad.dispose();
