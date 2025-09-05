@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vediczy/screens/exam_list_screen.dart';
-// ... baaki zaroori imports jaise firebase_auth, profile_screen etc. ...
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:vediczy/screens/profile/profile_screen.dart';
-
+import 'package:vediczy/services/firestore_service.dart'; // FirestoreService इम्पोर्ट करें
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -18,6 +17,20 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
+      // NAYA FLOATING ACTION BUTTON
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Adding sample data to Firestore...')),
+          );
+          await FirestoreService().addSampleData();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('✅ Sample data added successfully!')),
+          );
+        },
+        child: Icon(Icons.add),
+        tooltip: 'Add Sample Data',
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -39,8 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
   
   Widget _buildHeader() {
-    // Header ka code wahi rahega jo pichle jawab mein tha
-     return Container(
+    return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.indigo.shade600,
