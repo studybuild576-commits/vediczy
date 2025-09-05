@@ -2,10 +2,10 @@ import 'package.flutter/material.dart';
 import 'package.google_mobile_ads/google_mobile_ads.dart';
 
 class AdService {
-  // --- Ad Unit IDs ---
-  final String bannerAdUnitId = "ca-app-pub-2036566646997333/3122845917";
-  final String interstitialAdUnitId = "ca-app-pub-2036566646997333/2931274226";
-  final String rewardedAdUnitId = "ca-app-pub-2036566646997333/8303544469";
+  // --- Ad Unit IDs (Google Test IDs se badal diya gaya hai) ---
+  final String bannerAdUnitId = "ca-app-pub-3940256099942544/6300978111";
+  final String interstitialAdUnitId = "ca-app-pub-3940256099942544/1033173712";
+  final String rewardedAdUnitId = "ca-app-pub-3940256099942544/5224354917";
 
   BannerAd? _bannerAd;
   InterstitialAd? _interstitialAd;
