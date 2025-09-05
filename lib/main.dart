@@ -4,20 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vediczy/screens/auth/login_screen.dart';
 import 'package:vediczy/screens/main_navigation_screen.dart';
-import 'package:vediczy/services/ad_service.dart'; // AdService import karein
+import 'package:vediczy/services/ad_service.dart';
 import 'package:vediczy/services/auth_service.dart';
-import 'package.google_mobile_ads/google_mobile_ads.dart'; // Google Ads import karein
-import 'package.vediczy/screens/splash_screen.dart';
-
+import 'package:google_mobile_ads/google_mobile_ads.dart'; // सही इम्पोर्ट
+import 'package:vediczy/screens/splash_screen.dart'; // सही इम्पोर्ट
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await AdService.initialize(); // Ad SDK ko shuru karein
+  await AdService.initialize();
   await Firebase.initializeApp();
   runApp(MyApp());
 }
 
-// MyApp ko StatefulWidget mein badlein
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
@@ -29,12 +27,12 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _adService.loadBannerAd(); // Banner ad ko load karein
+    _adService.loadBannerAd();
   }
 
   @override
   void dispose() {
-    _adService.bannerAd?.dispose(); // Ad ko dispose karein
+    _adService.bannerAd?.dispose();
     super.dispose();
   }
 
@@ -47,11 +45,10 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         title: 'Vediczy Exam Prep',
         theme: ThemeData(primarySwatch: Colors.indigo),
-        // Builder ka istemal karke har screen ke neeche banner lagayein
         builder: (context, child) {
           return Column(
             children: [
-              Expanded(child: child ?? Container()), // Aapka app
+              Expanded(child: child ?? Container()),
               if (_adService.bannerAd != null)
                 Container(
                   color: Colors.white,
@@ -69,12 +66,10 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-// Wrapper class waisa hi rahega
 class Wrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User?>(context);
-
     if (user == null) {
       return LoginScreen();
     } else {
