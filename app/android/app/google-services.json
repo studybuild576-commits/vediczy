@@ -37,10 +37,18 @@
             {
               "client_id": "591156419005-g58p84e2d8jsskj4727ehrfdgaj7qn42.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "591156419005-3mha9h0rnbsg8he0a1jvj36jc4lmi6dl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.admin"
+              }
             }
           ]
         }
-      }
+      },
+      "admob_app_id": "ca-app-pub-2036566646997333~4449737005"
     }
   ],
   "configuration_version": "1"
