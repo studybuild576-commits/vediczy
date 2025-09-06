@@ -36,18 +36,3 @@
     }
   }
 }
-```
-eof
-
----
-
-### **अगले कदम**
-
-1.  **फ़ाइल को edit करें:** CodeSpaces में अपनी `firebase.json` फ़ाइल खोलें और उसमें `functions` का section जोड़ें।
-2.  **फिर से push करें:** एक बार जब आप फ़ाइल को save कर लें, तो `git` कमांड्स को फिर से चलाएं:
-
-    ```bash
-    git add .
-    git commit -m "feat: Add functions configuration to firebase.json"
-    git push origin main
-    
