@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "r2examprep"
+  },
+  "targets": {
+    "r2examprep": {
+      "hosting": {
+        "app": ["vediczy"],
+        "admin": ["vediczy-admin"],
+        "main": ["r2examprep"]
+      }
+    }
   }
 }
