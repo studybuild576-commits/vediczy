@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:vediczy/models/result_model.dart';
 import 'package:vediczy/services/ad_service.dart';
+import 'package:vediczy/services/ad_service_web.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart' as gads;
 
 class ResultScreen extends StatefulWidget {
@@ -17,7 +19,6 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   void initState() {
     super.initState();
-    // स्क्रीन खुलते ही इनाम वाला विज्ञापन लोड करें
     _adService.loadRewardedAd();
   }
 
@@ -26,7 +27,7 @@ class _ResultScreenState extends State<ResultScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Test Result'),
-        automaticallyImplyLeading: false, // Back बटन हटाएँ
+        automaticallyImplyLeading: false,
       ),
       body: Center(
         child: Padding(
@@ -78,35 +79,43 @@ class _ResultScreenState extends State<ResultScreen> {
 
               const SizedBox(height: 20),
 
-              // इनाम वाले विज्ञापन के लिए नया बटन
               ElevatedButton.icon(
                 icon: const Icon(Icons.video_collection),
                 label: const Text('Watch Ad to See Solutions'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 ),
                 onPressed: () {
-                  _adService.showRewardedAd(
-                      onUserEarnedReward: (gads.RewardItem reward) {
-                    print("Reward earned: ${reward.amount} ${reward.type}");
-                    // इनाम मिलने पर उपयोगकर्ता को एक संदेश दिखाएँ
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Reward Earned! Solutions Unlocked.')),
+                  if (kIsWeb) {
+                    // ✅ Web reward dummy
+                    _adService.showRewardedAd(
+                      onUserEarnedReward: (WebRewardItem reward) {
+                        print("Web reward earned: ${reward.amount} ${reward.type}");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Web Reward Earned! Solutions Unlocked.')),
+                        );
+                      },
                     );
-                  });
+                  } else {
+                    // ✅ Mobile reward real
+                    _adService.showRewardedAd(
+                      onUserEarnedReward: (gads.RewardItem reward) {
+                        print("Reward earned: ${reward.amount} ${reward.type}");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Reward Earned! Solutions Unlocked.')),
+                        );
+                      },
+                    );
+                  }
                 },
               ),
 
               const SizedBox(height: 10),
 
               ElevatedButton(
-                style:
-                    ElevatedButton.styleFrom(minimumSize: const Size(200, 50)),
+                style: ElevatedButton.styleFrom(minimumSize: const Size(200, 50)),
                 onPressed: () {
-                  // उपयोगकर्ता को Home Screen पर वापस भेजें
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
                 child: const Text('Back to Home'),
@@ -136,4 +145,3 @@ class _ResultScreenState extends State<ResultScreen> {
     );
   }
 }
-
