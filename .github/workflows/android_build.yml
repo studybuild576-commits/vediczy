@@ -1,4 +1,4 @@
-name: Check Flutter Web Build
+name: Check Admin Panel Web Build
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-web:
+  build-admin-web:
     runs-on: ubuntu-latest
 
     permissions:
@@ -24,10 +24,10 @@ jobs:
         channel: 'stable'
         cache: true
 
-    - name: Install dependencies
+    - name: Install admin dependencies
       run: flutter pub get
-      working-directory: ./app  # "app" folder ke andar chalao
+      working-directory: ./admin  # "admin" folder ke andar chalao
 
-    - name: Build Flutter Web App
+    - name: Build admin panel web app
       run: flutter build web
-      working-directory: ./app  # "app" folder ke andar chalao
+      working-directory: ./admin  # "admin" folder ke andar chalao
