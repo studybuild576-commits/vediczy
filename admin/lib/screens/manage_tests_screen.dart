@@ -8,35 +8,32 @@ class ManageTestsScreen extends StatelessWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => AddEditTestScreen()),
-          );
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddEditTestScreen()));
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         tooltip: 'Add New Test',
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('Tests').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text("No tests found. Add one!"));
+            return const Center(child: Text("No tests found. Add one!"));
           }
           final tests = snapshot.data!.docs;
           return ListView.builder(
             itemCount: tests.length,
             itemBuilder: (context, index) {
               final test = tests[index];
+              final data = test.data() as Map<String, dynamic>;
               return ListTile(
-                title: Text(test['title']),
-                subtitle: Text("Exam: ${test['examName']}"),
-                trailing: Icon(Icons.edit),
+                title: Text(data['title'] ?? 'No Title'),
+                subtitle: Text("Exam: ${data['examName'] ?? 'N/A'}"),
+                trailing: const Icon(Icons.edit),
                 onTap: () {
-                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => AddEditTestScreen(testDocument: test)),
-                  );
+                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddEditTestScreen(testDocument: test)));
                 },
               );
             },
