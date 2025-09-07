@@ -1,17 +1,13 @@
+// File: app/lib/services/ad_service_web.dart
 import 'package:flutter/material.dart';
 // Note: Hum yahan google_mobile_ads ko import nahi kar rahe hain
 
-// Dummy classes taaki code mein error na aaye
-class BannerAd {
-  final AdSize size;
-  BannerAd({required this.size});
-  void dispose() {}
-}
-class AdSize { static const AdSize banner = AdSize(); double get width => 0; double get height => 0;}
+// Dummy class, taaki code mein error na aaye
 class RewardItem {}
 
 class AdService {
-  BannerAd? get bannerAd => null; // Hamesha null return karega
+  // Web par koi banner nahi hai, isliye null bhej rahe hain
+  dynamic get bannerAd => null;
 
   static Future<void> initialize() async {
     // Web par kuch nahi karna
