@@ -1,9 +1,7 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:vediczy/models/result_model.dart';
 import 'package:vediczy/services/ad_service.dart';
-import 'package:vediczy/services/ad_service_web.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart' as gads;
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class ResultScreen extends StatefulWidget {
   final TestResult result;
@@ -49,14 +47,15 @@ class _ResultScreenState extends State<ResultScreen> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      Text(
-                        'Your Score',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
+                      Text('Your Score',
+                          style: Theme.of(context).textTheme.titleLarge),
                       const SizedBox(height: 10),
                       Text(
                         widget.result.score.toStringAsFixed(2),
-                        style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        style: Theme.of(context)
+                            .textTheme
+                            .displayMedium
+                            ?.copyWith(
                               color: Colors.green,
                               fontWeight: FontWeight.bold,
                             ),
@@ -84,37 +83,25 @@ class _ResultScreenState extends State<ResultScreen> {
                 label: const Text('Watch Ad to See Solutions'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 12),
                 ),
                 onPressed: () {
-                  if (kIsWeb) {
-                    // ✅ Web reward dummy
-                    _adService.showRewardedAd(
-                      onUserEarnedReward: (WebRewardItem reward) {
-                        print("Web reward earned: ${reward.amount} ${reward.type}");
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Web Reward Earned! Solutions Unlocked.')),
-                        );
-                      },
+                  _adService.showRewardedAd(onUserEarnedReward: (reward) {
+                    print("Reward earned: ${reward.amount} ${reward.type}");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Reward Earned! Solutions Unlocked.')),
                     );
-                  } else {
-                    // ✅ Mobile reward real
-                    _adService.showRewardedAd(
-                      onUserEarnedReward: (gads.RewardItem reward) {
-                        print("Reward earned: ${reward.amount} ${reward.type}");
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Reward Earned! Solutions Unlocked.')),
-                        );
-                      },
-                    );
-                  }
+                  });
                 },
               ),
 
               const SizedBox(height: 10),
 
               ElevatedButton(
-                style: ElevatedButton.styleFrom(minimumSize: const Size(200, 50)),
+                style:
+                    ElevatedButton.styleFrom(minimumSize: const Size(200, 50)),
                 onPressed: () {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
