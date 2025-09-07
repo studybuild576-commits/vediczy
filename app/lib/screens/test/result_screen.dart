@@ -87,13 +87,16 @@ class _ResultScreenState extends State<ResultScreen> {
                       horizontal: 20, vertical: 12),
                 ),
                 onPressed: () {
-                  _adService.showRewardedAd(onUserEarnedReward: (reward) {
-                    print("Reward earned: ${reward.amount} ${reward.type}");
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Reward Earned! Solutions Unlocked.')),
-                    );
-                  });
+                  _adService.showRewardedAd(
+                    onUserEarnedReward: (reward) {
+                      final RewardItem r = reward as RewardItem; // ✅ FIXED
+                      print("Reward earned: ${r.amount} ${r.type}");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Reward Earned! Solutions Unlocked.')),
+                      );
+                    },
+                  );
                 },
               ),
 
