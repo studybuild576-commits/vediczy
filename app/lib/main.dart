@@ -1,21 +1,17 @@
-import 'package:flutter/foundation.dart' show kIsWeb; // Platform जांचने के लिए
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:vediczy/screens/auth/login_screen.dart';
 import 'package:vediczy/screens/main_navigation_screen.dart';
-import 'package:vediczy/services/ad_service.dart';
+import 'package:vediczy/services/ad_service.dart'; // Sirf is ek file ko import karein
 import 'package:vediczy/services/auth_service.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:vediczy/screens/splash_screen.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart'; // Iski zaroorat pad sakti hai
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // सिर्फ़ मोबाइल पर Ad Service शुरू करें
-  if (!kIsWeb) {
-    await AdService.initialize();
-  }
+  await AdService.initialize();
   await Firebase.initializeApp();
   runApp(MyApp());
 }
@@ -31,17 +27,12 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // सिर्फ़ मोबाइल पर बैनर लोड करें
-    if (!kIsWeb) {
-      _adService.loadBannerAd();
-    }
+    _adService.loadBannerAd();
   }
 
   @override
   void dispose() {
-    if (!kIsWeb) {
-      _adService.bannerAd?.dispose();
-    }
+    _adService.bannerAd?.dispose();
     super.dispose();
   }
 
@@ -55,21 +46,20 @@ class _MyAppState extends State<MyApp> {
         title: 'Vediczy Exam Prep',
         theme: ThemeData(primarySwatch: Colors.indigo),
         builder: (context, child) {
-          // सिर्फ़ मोबाइल पर बैनर दिखाएँ
-          if (kIsWeb) {
-            return child ?? Container();
+          final banner = _adService.bannerAd;
+          if (banner == null) {
+            return child ?? Container(); // Agar ad nahi hai, to sirf app dikhayein
           }
           return Column(
             children: [
               Expanded(child: child ?? Container()),
-              if (_adService.bannerAd != null)
-                Container(
-                  color: Colors.white,
-                  alignment: Alignment.center,
-                  width: _adService.bannerAd!.size.width.toDouble(),
-                  height: _adService.bannerAd!.size.height.toDouble(),
-                  child: AdWidget(ad: _adService.bannerAd!),
-                ),
+              Container(
+                color: Colors.white,
+                alignment: Alignment.center,
+                width: banner.size.width.toDouble(),
+                height: banner.size.height.toDouble(),
+                child: AdWidget(ad: banner),
+              ),
             ],
           );
         },
@@ -79,7 +69,7 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-// Wrapper class वैसी ही रहेगी
+// Wrapper class waisa hi rahega
 class Wrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
