@@ -29,7 +29,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     return Scaffold(
       body: Center(
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 400),
+          constraints: const BoxConstraints(maxWidth: 400),
           child: Card(
             elevation: 8,
             child: Padding(
@@ -38,16 +38,16 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('Admin Panel Login', style: Theme.of(context).textTheme.headlineSmall),
-                  SizedBox(height: 20),
-                  TextField(controller: _emailController, decoration: InputDecoration(labelText: 'Email')),
-                  SizedBox(height: 10),
-                  TextField(controller: _passwordController, decoration: InputDecoration(labelText: 'Password'), obscureText: true),
+                  const SizedBox(height: 20),
+                  TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'Email')),
+                  const SizedBox(height: 10),
+                  TextField(controller: _passwordController, decoration: const InputDecoration(labelText: 'Password'), obscureText: true),
                   if (_error != null) ...[
-                    SizedBox(height: 10),
-                    Text(_error!, style: TextStyle(color: Colors.red)),
+                    const SizedBox(height: 10),
+                    Text(_error!, style: const TextStyle(color: Colors.red)),
                   ],
-                  SizedBox(height: 20),
-                  ElevatedButton(onPressed: _login, child: Text('Login')),
+                  const SizedBox(height: 20),
+                  ElevatedButton(onPressed: _login, child: const Text('Login')),
                 ],
               ),
             ),
