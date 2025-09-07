@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vediczy/models/result_model.dart';
 import 'package:vediczy/services/ad_service.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart' as gads;
 
 class ResultScreen extends StatefulWidget {
   final TestResult result;
@@ -25,7 +25,7 @@ class _ResultScreenState extends State<ResultScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Test Result'),
+        title: const Text('Test Result'),
         automaticallyImplyLeading: false, // Back बटन हटाएँ
       ),
       body: Center(
@@ -36,10 +36,12 @@ class _ResultScreenState extends State<ResultScreen> {
             children: [
               Text(
                 'Test Completed!',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
-              SizedBox(height: 20),
-              
+              const SizedBox(height: 20),
+
               Card(
                 elevation: 5,
                 child: Padding(
@@ -50,54 +52,64 @@ class _ResultScreenState extends State<ResultScreen> {
                         'Your Score',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
                         widget.result.score.toStringAsFixed(2),
                         style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                          color: Colors.green,
-                          fontWeight: FontWeight.bold,
-                        ),
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
-                      Divider(height: 30),
-                      _buildResultRow('Total Questions:', '${widget.result.totalQuestions}'),
-                      _buildResultRow('Attempted:', '${widget.result.attemptedQuestions}'),
-                      _buildResultRow('Correct Answers:', '${widget.result.correctAnswers}', color: Colors.green),
-                      _buildResultRow('Incorrect Answers:', '${widget.result.incorrectAnswers}', color: Colors.red),
+                      const Divider(height: 30),
+                      _buildResultRow(
+                          'Total Questions:', '${widget.result.totalQuestions}'),
+                      _buildResultRow(
+                          'Attempted:', '${widget.result.attemptedQuestions}'),
+                      _buildResultRow('Correct Answers:',
+                          '${widget.result.correctAnswers}',
+                          color: Colors.green),
+                      _buildResultRow('Incorrect Answers:',
+                          '${widget.result.incorrectAnswers}',
+                          color: Colors.red),
                     ],
                   ),
                 ),
               ),
-              
-              SizedBox(height: 20),
+
+              const SizedBox(height: 20),
 
               // इनाम वाले विज्ञापन के लिए नया बटन
               ElevatedButton.icon(
-                icon: Icon(Icons.video_collection),
-                label: Text('Watch Ad to See Solutions'),
+                icon: const Icon(Icons.video_collection),
+                label: const Text('Watch Ad to See Solutions'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 ),
                 onPressed: () {
-                  _adService.showRewardedAd(onUserEarnedReward: (RewardItem reward) {
-                     print("Reward earned: ${reward.amount} ${reward.type}");
-                     // इनाम मिलने पर उपयोगकर्ता को एक संदेश दिखाएँ
-                     ScaffoldMessenger.of(context).showSnackBar(
-                       SnackBar(content: Text('Reward Earned! Solutions Unlocked.')),
-                     );
+                  _adService.showRewardedAd(
+                      onUserEarnedReward: (gads.RewardItem reward) {
+                    print("Reward earned: ${reward.amount} ${reward.type}");
+                    // इनाम मिलने पर उपयोगकर्ता को एक संदेश दिखाएँ
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Reward Earned! Solutions Unlocked.')),
+                    );
                   });
                 },
               ),
-              
-              SizedBox(height: 10),
+
+              const SizedBox(height: 10),
 
               ElevatedButton(
-                style: ElevatedButton.styleFrom(minimumSize: Size(200, 50)),
+                style:
+                    ElevatedButton.styleFrom(minimumSize: const Size(200, 50)),
                 onPressed: () {
                   // उपयोगकर्ता को Home Screen पर वापस भेजें
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
-                child: Text('Back to Home'),
+                child: const Text('Back to Home'),
               )
             ],
           ),
@@ -106,16 +118,22 @@ class _ResultScreenState extends State<ResultScreen> {
     );
   }
 
-  Widget _buildResultRow(String title, String value, {Color color = Colors.black}) {
+  Widget _buildResultRow(String title, String value,
+      {Color color = Colors.black}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-          Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)),
+          Text(title,
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+          Text(value,
+              style: TextStyle(
+                  fontSize: 16, fontWeight: FontWeight.bold, color: color)),
         ],
       ),
     );
   }
 }
+
