@@ -1,13 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:vediczy/services/ad_service.dart';
+import 'package:vediczy/screens/splash_screen.dart';
+import 'package:vediczy/services/auth_service.dart';
 import 'package:vediczy/screens/auth/login_screen.dart';
 import 'package:vediczy/screens/main_navigation_screen.dart';
-import 'package:vediczy/services/ad_service.dart'; // Sirf is ek file ko import karein
-import 'package:vediczy/services/auth_service.dart';
-import 'package:vediczy/screens/splash_screen.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart'; // Iski zaroorat pad sakti hai
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,17 +48,17 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(primarySwatch: Colors.indigo),
         builder: (context, child) {
           final banner = _adService.bannerAd;
+          // Agar banner null hai (jaise web par), to kuch na dikhayein
           if (banner == null) {
-            return child ?? Container(); // Agar ad nahi hai, to sirf app dikhayein
+            return child ?? Container();
           }
           return Column(
             children: [
               Expanded(child: child ?? Container()),
               Container(
-                color: Colors.white,
                 alignment: Alignment.center,
-                width: banner.size.width.toDouble(),
-                height: banner.size.height.toDouble(),
+                width: (banner as BannerAd).size.width.toDouble(),
+                height: (banner as BannerAd).size.height.toDouble(),
                 child: AdWidget(ad: banner),
               ),
             ],
