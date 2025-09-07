@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:vediczy_admin/screens/dashboard_screen.dart';
 import 'package:vediczy_admin/screens/manage_tests_screen.dart';
+import 'package:vediczy_admin/screens/manage_revision_screen.dart'; // नया इम्पोर्ट
 
 class MainLayout extends StatefulWidget {
   @override
@@ -42,6 +43,12 @@ class _MainLayoutState extends State<MainLayout> {
               leading: Icon(Icons.article),
               title: const Text('Manage Tests'),
               onTap: () => _navigateTo(ManageTestsScreen()),
+            ),
+            // YEH NAYA MENU ITEM HAI
+            ListTile(
+              leading: Icon(Icons.picture_as_pdf),
+              title: const Text('Manage Revision'),
+              onTap: () => _navigateTo(ManageRevisionScreen()),
             ),
           ],
         ),
