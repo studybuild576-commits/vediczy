@@ -1,6 +1,6 @@
-// File: app/lib/services/ad_service_mobile.dart
+// File: lib/services/ad_service_mobile.dart
 import 'package:flutter/material.dart';
-import 'package.google_mobile_ads/google_mobile_ads.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdService {
   final String bannerAdUnitId = "ca-app-pub-3940256099942544/6300978111";
@@ -17,6 +17,7 @@ class AdService {
     await MobileAds.instance.initialize();
   }
 
+  /// ✅ Banner Ad
   void loadBannerAd() {
     _bannerAd?.dispose();
     _bannerAd = BannerAd(
@@ -24,19 +25,26 @@ class AdService {
       request: const AdRequest(),
       size: AdSize.banner,
       listener: BannerAdListener(
-        onAdLoaded: (ad) => print('✅ Banner Ad loaded.'),
-        onAdFailedToLoad: (ad, err) => ad.dispose(),
+        onAdLoaded: (ad) => debugPrint('✅ Banner Ad loaded.'),
+        onAdFailedToLoad: (ad, err) {
+          debugPrint('❌ Banner Ad failed: $err');
+          ad.dispose();
+        },
       ),
     )..load();
   }
 
+  /// ✅ Interstitial Ad
   void loadInterstitialAd() {
     InterstitialAd.load(
       adUnitId: interstitialAdUnitId,
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) => _interstitialAd = ad,
-        onAdFailedToLoad: (error) => _interstitialAd = null,
+        onAdFailedToLoad: (error) {
+          debugPrint('❌ Interstitial failed: $error');
+          _interstitialAd = null;
+        },
       ),
     );
   }
@@ -52,6 +60,7 @@ class AdService {
         onAdDismissed();
       },
       onAdFailedToShowFullScreenContent: (ad, error) {
+        debugPrint('❌ Interstitial show failed: $error');
         ad.dispose();
         onAdDismissed();
       },
@@ -60,32 +69,43 @@ class AdService {
     _interstitialAd = null;
   }
 
+  /// ✅ Rewarded Ad
   void loadRewardedAd() {
     RewardedAd.load(
       adUnitId: rewardedAdUnitId,
       request: const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) => _rewardedAd = ad,
-        onAdFailedToLoad: (error) => _rewardedAd = null,
+        onAdFailedToLoad: (error) {
+          debugPrint('❌ Rewarded failed: $error');
+          _rewardedAd = null;
+        },
       ),
     );
   }
 
   void showRewardedAd({required Function(RewardItem) onUserEarnedReward}) {
-    if (_rewardedAd == null) return;
+    if (_rewardedAd == null) {
+      debugPrint('⚠️ Rewarded Ad not ready');
+      return;
+    }
     _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
       onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
         loadRewardedAd();
       },
-       onAdFailedToShowFullScreenContent: (ad, error) {
+      onAdFailedToShowFullScreenContent: (ad, error) {
+        debugPrint('❌ Rewarded show failed: $error');
         ad.dispose();
         loadRewardedAd();
       },
     );
-    _rewardedAd!.show(onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
-      onUserEarnedReward(reward);
-    });
+    _rewardedAd!.show(
+      onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+        // ✅ Ensure reward is RewardItem
+        onUserEarnedReward(reward);
+      },
+    );
     _rewardedAd = null;
   }
 }
