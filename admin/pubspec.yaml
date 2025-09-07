@@ -15,10 +15,12 @@ dependencies:
   firebase_core: ^2.27.1
   firebase_auth: ^4.17.9
   cloud_firestore: ^4.15.9
+  firebase_storage: ^11.6.10  # यह PDF स्टोरेज के लिए है
 
-  # UI Packages
+  # UI and File Packages
   google_fonts: ^6.2.1
   cupertino_icons: ^1.0.8
+  file_picker: ^8.0.0+1      # यह फाइल चुनने के लिए है
 
 dev_dependencies:
   flutter_test:
