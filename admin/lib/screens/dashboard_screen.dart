@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Firestore se test count laane ke liye ek Future banayein
     final Future<AggregateQuerySnapshot> testCountFuture = 
         FirebaseFirestore.instance.collection('Tests').count().get();
 
@@ -13,15 +12,15 @@ class DashboardScreen extends StatelessWidget {
         future: testCountFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           }
           if (snapshot.hasError) {
-            return Text('Error loading data!');
+            return const Text('Error loading data!');
           }
           if (snapshot.hasData) {
-            int testCount = snapshot.data?.count ?? 0; // Null check ke saath
+            int testCount = snapshot.data?.count ?? 0;
             return Card(
-              margin: EdgeInsets.all(20),
+              margin: const EdgeInsets.all(20),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Text(
@@ -31,7 +30,7 @@ class DashboardScreen extends StatelessWidget {
               ),
             );
           }
-          return Text('No data found.');
+          return const Text('No data found.');
         },
       ),
     );
