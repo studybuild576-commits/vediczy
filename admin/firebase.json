@@ -1,1 +1,34 @@
-{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"r2examprep","configurations":{"ios":"1:591156419005:ios:e41304a82abf02bae55ad4","macos":"1:591156419005:ios:e41304a82abf02bae55ad4","web":"1:591156419005:web:7148c5be912f75c1e55ad4","windows":"1:591156419005:web:b53349dddbe32cb4e55ad4"}}}}}}
+{
+  "hosting": [
+    {
+      "target": "app",
+      "public": "app/build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    {
+      "target": "admin",
+      "public": "admin/build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ]
+}
